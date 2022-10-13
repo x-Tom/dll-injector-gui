@@ -1,4 +1,5 @@
 #include "WMain.h"
+#include "WText.h"
 
 WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
 {
@@ -20,7 +21,7 @@ WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, in
     RegisterClassEx(&wc);
 }
 
-bool WMain::Create()
+bool WMain::Create(HWND)
 {
     hwnd = CreateWindowEx(
         0, wndClassName,
@@ -84,3 +85,12 @@ void WMain::MsgBox(const std::wstring& title, const std::wstring& msg)
 {
     MessageBox(hwnd, title.c_str(), msg.c_str(), MB_OK);
 }
+
+//bool WMain::CreateChildren() {
+//    for (void* pchild : children) {
+//        if (pchild == nullptr) continue;
+//        ((WText*)pchild)->Create();
+//    }
+//    // loop through children vec, if chidren vec has non nullptr element call create on it
+//    return true;
+//}

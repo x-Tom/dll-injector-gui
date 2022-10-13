@@ -11,9 +11,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     GWindow::initCC();
 
     WMain MainWindow(hInstance, L"hello");
-    WText Header(hInstance, MainWindow.Handle(), (HMENU)100, 10, 10, 50, 50, L"HELLO WORLD");
+    WText Header(hInstance, MainWindow.Handle(), (HMENU)100, 10, 10, 50, 50, L"HELLO WORLD"); // main window has no handle create must 
     MainWindow.Add(&Header);
-    MainWindow.Create();
+    MainWindow.Create(NULL);
 
     //init child windows calls create of each child
            

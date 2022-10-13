@@ -8,12 +8,13 @@ public:
 	WMain() = default;
 	~WMain() = default;
 
-	bool Create() override;
+	bool Create(HWND) override;
 	LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 	bool ProcessMessage();
 	
 	void Kill();
 	void MsgBox(const std::wstring&, const std::wstring&);
+	//bool CreateChildren();
 protected:
 
 	const std::wstring title;

@@ -11,7 +11,7 @@ public:
 	GChild(HINSTANCE, LPCWSTR, LPWNDCLASSEX, HWND, HMENU, int, int, int, int);
 	GChild() = default;
 	~GChild() = default;
-	virtual bool Create() = 0;
+	virtual bool Create(HWND) = 0;
 	GChild(const GChild&) = delete;
 	GChild& operator=(const GChild&) = delete;
 

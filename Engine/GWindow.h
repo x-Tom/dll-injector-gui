@@ -19,7 +19,7 @@ public:
 	GWindow(HINSTANCE,LPCWSTR,LPWNDCLASSEX, int, int, int, int);
 	GWindow() = default;
 	~GWindow();
-	virtual bool Create() = 0; //create window
+	virtual bool Create(HWND) = 0; //create window
 	virtual bool Add(void*);
 	GWindow(const GWindow&) = delete;
 	GWindow& operator=(const GWindow&) = delete;
@@ -43,7 +43,7 @@ protected:
 
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
-	/*virtual*/ bool CreateChildren();
+	virtual bool CreateChildren();
 
 
 };

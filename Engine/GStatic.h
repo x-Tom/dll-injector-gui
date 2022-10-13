@@ -6,7 +6,7 @@ public:
 	GStatic(HINSTANCE, HWND, HMENU, int, int, int, int);
 	GStatic() = default;
 	~GStatic() = default;
-	virtual bool Create() = 0;
+	virtual bool Create(HWND) = 0;
 	GStatic(const GStatic&) = delete;
 	GStatic& operator=(const GStatic&) = delete;
 

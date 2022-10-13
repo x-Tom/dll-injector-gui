@@ -48,7 +48,7 @@ LRESULT __stdcall GWindow::_WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 bool GWindow::CreateChildren() {
     for (void* pchild : children) {
         if (pchild == nullptr) continue;
-        ((GWindow*)pchild)->Create();
+        ((GWindow*)pchild)->Create(hwnd);
     }
     // loop through children vec, if chidren vec has non nullptr element call create on it
     return true;
