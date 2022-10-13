@@ -1,6 +1,6 @@
 #include "GWindow.h"
 
-GWindow::GWindow(HINSTANCE hInst, LPCWSTR wcn, LPWNDCLASSEX pwc) : hwnd(nullptr), hinst(hInst), wndClassName(wcn)
+GWindow::GWindow(HINSTANCE hInst, LPCWSTR wcn, LPWNDCLASSEX pwc, int x, int y, int w, int h) : hwnd(nullptr), hinst(hInst), wndClassName(wcn), x(x), y(y), w(w), h(h)
 {
     if (pwc != nullptr) {
         pwc->lpfnWndProc = GWindow::_WindowProcSetup;
@@ -66,4 +66,9 @@ BOOL GWindow::initCC() {
     iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     iccex.dwICC = ICC_LISTVIEW_CLASSES;
     return InitCommonControlsEx(&iccex);
+}
+
+HWND GWindow::Handle()
+{
+    return hwnd;
 }

@@ -16,7 +16,7 @@
 class GWindow
 {
 public:
-	GWindow(HINSTANCE,LPCWSTR,LPWNDCLASSEX);
+	GWindow(HINSTANCE,LPCWSTR,LPWNDCLASSEX, int, int, int, int);
 	GWindow() = default;
 	~GWindow();
 	virtual bool Create() = 0; //create window
@@ -25,11 +25,14 @@ public:
 	GWindow& operator=(const GWindow&) = delete;
 	
 	static BOOL initCC();
+	HWND Handle();
 
 protected:
 	HWND hwnd;
 	HINSTANCE hinst;
 	LPCWSTR wndClassName;
+	int x, y, w, h;
+	
 	std::vector<void*> children; //recast as GChild*?
 
 	
@@ -40,7 +43,7 @@ protected:
 
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
-	virtual bool CreateChildren();
+	/*virtual*/ bool CreateChildren();
 
 
 };

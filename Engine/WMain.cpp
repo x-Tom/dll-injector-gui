@@ -1,6 +1,6 @@
 #include "WMain.h"
 
-WMain::WMain(HINSTANCE hInst, const std::wstring& title, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr), title(title), width(w), height(h)
+WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
 {
     WNDCLASSEX wc = { 0 };
 
@@ -25,7 +25,7 @@ bool WMain::Create()
     hwnd = CreateWindowEx(
         0, wndClassName,
         title.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-        200, 200, 640, 640,
+        x, y, h, w,
         nullptr, nullptr, hinst, this // pass in this to WinAPI so it can get access to member function from static function
     );
 
@@ -48,6 +48,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         DestroyWindow(hwnd);
         break;
     case WM_CREATE:
+        //CreateWindowEx(0, WC_STATIC, L"Hello WOrld", WS_CHILD | WS_VISIBLE, 10, 10, 50, 50, hwnd, (HMENU)100, hinst, nullptr);
         CreateChildren();
         break;
     case WM_SIZE:

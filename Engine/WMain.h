@@ -4,7 +4,7 @@
 class WMain : public GWindow
 {
 public:
-	WMain(HINSTANCE, const std::wstring&, int w = 640, int h = 640);
+	WMain(HINSTANCE, const std::wstring&, int = 200, int = 200, int = 640, int = 640);
 	WMain() = default;
 	~WMain() = default;
 
@@ -15,8 +15,7 @@ public:
 	void Kill();
 	void MsgBox(const std::wstring&, const std::wstring&);
 protected:
-	int width;
-	int height;
+
 	const std::wstring title;
 
 };

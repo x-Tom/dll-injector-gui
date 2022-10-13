@@ -1,7 +1,7 @@
 #include <iostream>
 #include "WinHeader.h"
 #include "WMain.h"
-
+#include "WText.h"
 
 
 
@@ -11,6 +11,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     GWindow::initCC();
 
     WMain MainWindow(hInstance, L"hello");
+    WText Header(hInstance, MainWindow.Handle(), (HMENU)100, 10, 10, 50, 50, L"HELLO WORLD");
+    MainWindow.Add(&Header);
     MainWindow.Create();
 
     //init child windows calls create of each child

@@ -27,6 +27,12 @@
     <ClCompile Include="WMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GStatic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineWindow.h">
@@ -44,7 +50,10 @@
     <ClInclude Include="WMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WStatic.h">
+    <ClInclude Include="GStatic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

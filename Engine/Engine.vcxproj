@@ -152,6 +152,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GChild.cpp" />
     <ClCompile Include="WMain.cpp" />
+    <ClCompile Include="GStatic.cpp" />
+    <ClCompile Include="WText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineWindow.h" />
@@ -159,7 +161,8 @@
     <ClInclude Include="GChild.h" />
     <ClInclude Include="WinHeader.h" />
     <ClInclude Include="WMain.h" />
-    <ClInclude Include="WStatic.h" />
+    <ClInclude Include="GStatic.h" />
+    <ClInclude Include="WText.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
