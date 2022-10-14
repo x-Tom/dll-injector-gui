@@ -6,7 +6,7 @@ WText::WText(HINSTANCE hInst, HWND parent, HMENU ID, int x, int y, int w, int h,
 }
 
 bool WText::Create(HWND Parent) { // consider creating blankwindow and using GDI and HDC to draw text and set fonts?
-	parent = Parent;
+	GChild::Create(Parent);
 	hwnd = CreateWindow(WC_STATIC, text.c_str(), WS_CHILD | WS_VISIBLE | WS_BORDER, x, y, w, h, parent, id, hinst, nullptr);
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
