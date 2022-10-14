@@ -1,6 +1,6 @@
 #include "GStatic.h"
 
-GStatic::GStatic(HINSTANCE hInst, HWND parent, HMENU id, int x, int y, int w, int h) : GChild(hInst, WC_STATIC, nullptr, parent, id, x, y, w, h)
+GStatic::GStatic(HINSTANCE hInst, HMENU id, int x, int y, int w, int h) : GChild(hInst, WC_STATIC, nullptr, id, x, y, w, h)
 {
 
 }

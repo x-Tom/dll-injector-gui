@@ -55,6 +55,19 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         //this->ConfigureEnumChildWindows();
         break;
+    case WM_CTLCOLORSTATIC:
+        // void* pctl;
+        // for(auto child : children){
+        //     if(child.Handle() == lParam) pctl = child;
+        // }
+
+        // pctl->Background((HDC) wParam);
+        HDC hdcStatic = (HDC) wParam;
+        SetTextColor(hdcStatic, RGB(0,0,0));
+        SetBkColor(hdcStatic, RGB(230,230,230));
+        return (INT_PTR)CreateSolidBrush(RGB(230,230,230));
+        // return (INT_PTR)GetSysColor(COLOR_WINDOW);
+        break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
