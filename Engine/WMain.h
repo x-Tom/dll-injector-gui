@@ -8,7 +8,7 @@ public:
 	WMain() = default;
 	~WMain() = default;
 
-	bool Create(HWND) override;
+	bool Create(HWND=nullptr) override;
 	LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 	bool ProcessMessage();
 	
