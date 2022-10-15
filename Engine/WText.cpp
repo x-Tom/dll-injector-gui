@@ -1,6 +1,6 @@
 #include "WText.h"
 
-WText::WText(HINSTANCE hInst, HWND parent, HMENU ID, int x, int y, int w, int h, std::wstring text) : GStatic(hInst, parent, ID, x,y,w,h), text(text)
+WText::WText(HINSTANCE hInst, HMENU ID, int x, int y, int w, int h, std::wstring text) : GStatic(hInst, ID, x,y,w,h), text(text)
 {
 
 }
