@@ -61,7 +61,7 @@ bool GWindow::Add(void* pchild) {
 
 
 
-BOOL GWindow::initCC() {
+BOOL GWindow::INIT_COMMON_CONTROLS() {
     INITCOMMONCONTROLSEX iccex;
     iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     iccex.dwICC = ICC_LISTVIEW_CLASSES;
@@ -72,3 +72,5 @@ HWND GWindow::Handle()
 {
     return hwnd;
 }
+
+bool LoadBitmaps(){return true;}

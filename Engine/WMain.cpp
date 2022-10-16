@@ -55,7 +55,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         //this->ConfigureEnumChildWindows();
         break;
-    case WM_CTLCOLORSTATIC:
+    case WM_CTLCOLORSTATIC: // IDEALLY WE DONT WANT TO USE WC_STATIC CONTROL CHILD WINDOWS!!
         // void* pctl;
         // for(auto child : children){
         //     if(child.Handle() == lParam) pctl = child;
