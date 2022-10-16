@@ -64,9 +64,9 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // pctl->Background((HDC) wParam);
         HDC hdcStatic = (HDC) wParam;
         SetTextColor(hdcStatic, RGB(0,0,0));
-        SetBkColor(hdcStatic, RGB(230,230,230));
-        return (INT_PTR)CreateSolidBrush(RGB(230,230,230));
-        // return (INT_PTR)GetSysColor(COLOR_WINDOW);
+        SetBkMode(hdcStatic, TRANSPARENT);
+        //return (INT_PTR)CreateSolidBrush(TRANSPARENT);
+        return (INT_PTR)GetSysColor(COLOR_WINDOW);
         break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -97,6 +97,13 @@ void WMain::Kill()
 void WMain::MsgBox(const std::wstring& title, const std::wstring& msg)
 {
     MessageBox(hwnd, title.c_str(), msg.c_str(), MB_OK);
+}
+
+void WMain::Text(std::wstring txt, int x, int y, int w, int h)
+{
+    HDC hdc = GetDC(hwnd);
+    RECT txtbox = { x,y,w,h };
+    DrawText(hdc, txt.c_str(), txt.length(), &txtbox, DT_CENTER );
 }
 
 //bool WMain::CreateChildren() {

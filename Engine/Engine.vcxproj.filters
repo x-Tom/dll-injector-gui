@@ -33,6 +33,9 @@
     <ClCompile Include="WText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineWindow.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
