@@ -1,8 +1,7 @@
 #include <iostream>
 #include "WinHeader.h"
 #include "WMain.h"
-#include "WText.h"
-
+#include "WButton.h"
 
 
 
@@ -10,10 +9,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     GWindow::initCC();
 
-    WMain MainWindow(hInstance, L"hello");
-    WText Header(hInstance, (HMENU)100, 10, 10, 50, 50, L"HELLO WORLD"); // main window has no handle create must 
-    MainWindow.Add(&Header);
+    WMain MainWindow(hInstance, L"DLL Injector");
+    //WText Header(hInstance, (HMENU)100, 10, 10, 150, 50, L"HELLO WORLD"); // main window has no handle create must 
+    //MainWindow.Add(&Header);
+    
+    WButton Button(hInstance, (HMENU)100, 50, 50, 150, 50, L"Inject", BS_PUSHBUTTON);
+    MainWindow.Add(&Button);
     MainWindow.Create();
+    MainWindow.Text(L"DLL Injector", 10, 10, 150, 50);
+
 
     //init child windows calls create of each child
            

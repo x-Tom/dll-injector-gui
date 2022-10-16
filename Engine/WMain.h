@@ -14,6 +14,7 @@ public:
 	
 	void Kill();
 	void MsgBox(const std::wstring&, const std::wstring&);
+	void Text(std::wstring, int,int,int,int);
 	//bool CreateChildren();
 protected:
 
