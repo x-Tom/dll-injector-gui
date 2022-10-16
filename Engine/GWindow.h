@@ -23,8 +23,8 @@ public:
 	virtual bool Add(void*);
 	GWindow(const GWindow&) = delete;
 	GWindow& operator=(const GWindow&) = delete;
-	
-	static BOOL initCC();
+	virtual bool LoadBitmaps();
+	static BOOL INIT_COMMON_CONTROLS();
 	HWND Handle();
 
 protected:
@@ -42,6 +42,8 @@ protected:
 	static LRESULT WINAPI _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+
+	virtual bool LoadBitmaps();
 
 	virtual bool CreateChildren();
 

@@ -15,6 +15,8 @@ public:
 	void Kill();
 	void MsgBox(const std::wstring&, const std::wstring&);
 	void Text(std::wstring, int,int,int,int);
+	// void Image()
+	virtual bool LoadBitmaps() override;
 	//bool CreateChildren();
 protected:
 

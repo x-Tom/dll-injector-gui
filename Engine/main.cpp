@@ -7,7 +7,7 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
-    GWindow::initCC();
+    GWindow::INIT_COMMON_CONTROLS();
 
     WMain MainWindow(hInstance, L"DLL Injector");
     //WText Header(hInstance, (HMENU)100, 10, 10, 150, 50, L"HELLO WORLD"); // main window has no handle create must 
