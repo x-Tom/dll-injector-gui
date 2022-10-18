@@ -99,11 +99,21 @@ void WMain::MsgBox(const std::wstring& title, const std::wstring& msg)
     MessageBox(hwnd, title.c_str(), msg.c_str(), MB_OK);
 }
 
+// find way to get call into wm_paint case in windowproc, add parameters and whether image or text into struct vect
+
 void WMain::Text(std::wstring txt, int x, int y, int w, int h)
 {
     HDC hdc = GetDC(hwnd);
     RECT txtbox = { x,y,w,h };
     DrawText(hdc, txt.c_str(), txt.length(), &txtbox, DT_CENTER );
+}
+
+void WMain::Image(std::wstring img, int x, int y, int w, int h){
+
+}
+
+bool WMain::LoadBitmaps(){
+    LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BALL));
 }
 
 //bool WMain::CreateChildren() {
