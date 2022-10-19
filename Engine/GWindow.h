@@ -9,9 +9,9 @@
 #include <stdexcept>
 #include <cassert>
 #include <vector>
-#include <CommCtrl.h>
 
-#pragma comment(lib, "comctl32.lib")
+#define MV_SCREENHEIGHT GetSystemMetrics(SM_CYVIRTUALSCREEN)
+#define MV_SCREENWIDTH GetSystemMetrics(SM_CXVIRTUALSCREEN)
 
 class GWindow
 {
@@ -25,6 +25,7 @@ public:
 	GWindow& operator=(const GWindow&) = delete;
 	virtual bool LoadBitmaps();
 	static BOOL INIT_COMMON_CONTROLS();
+	static BOOL INIT_GDIPLUS();
 	HWND Handle();
 
 protected:
@@ -42,8 +43,6 @@ protected:
 	static LRESULT WINAPI _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
-
-	virtual bool LoadBitmaps();
 
 	virtual bool CreateChildren();
 

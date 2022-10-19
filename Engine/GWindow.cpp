@@ -68,9 +68,16 @@ BOOL GWindow::INIT_COMMON_CONTROLS() {
     return InitCommonControlsEx(&iccex);
 }
 
+BOOL GWindow::INIT_GDIPLUS()
+{
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    return Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+}
+
 HWND GWindow::Handle()
 {
     return hwnd;
 }
 
-bool LoadBitmaps(){return true;}
+bool GWindow::LoadBitmaps(){return true;}
