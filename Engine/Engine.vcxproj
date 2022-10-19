@@ -152,6 +152,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GChild.cpp" />
     <ClCompile Include="WButton.cpp" />
+    <ClCompile Include="WComboBox.cpp" />
     <ClCompile Include="WMain.cpp" />
     <ClCompile Include="GStatic.cpp" />
     <ClCompile Include="WText.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="GWindow.h" />
     <ClInclude Include="GChild.h" />
     <ClInclude Include="WButton.h" />
+    <ClInclude Include="WComboBox.h" />
     <ClInclude Include="WinHeader.h" />
     <ClInclude Include="WMain.h" />
     <ClInclude Include="GStatic.h" />

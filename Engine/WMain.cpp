@@ -5,6 +5,10 @@ WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, in
 {
     WNDCLASSEX wc = { 0 };
 
+    //COLORREF bgcolor = RGB(44, 44, 44);
+    COLORREF bgcolor = RGB(255, 255, 255);
+    //COLORREF bgcolor = RGB(31, 31, 31);
+
     wc.cbSize = sizeof(wc);
     wc.style = CS_OWNDC;
     wc.lpfnWndProc = _WindowProcSetup; // 
@@ -13,7 +17,7 @@ WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, in
     wc.hInstance = hinst;
     wc.hIcon = nullptr;
     wc.hCursor = nullptr;
-    wc.hbrBackground = nullptr;
+    wc.hbrBackground = (HBRUSH)CreateSolidBrush(bgcolor);
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = wndClassName;
     wc.hIconSm = nullptr;
@@ -26,7 +30,7 @@ bool WMain::Create(HWND)
     hwnd = CreateWindowEx(
         0, wndClassName,
         title.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-        x, y, h, w,
+        x, y, w, h,
         nullptr, nullptr, hinst, this // pass in this to WinAPI so it can get access to member function from static function
     );
 
@@ -51,6 +55,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         //CreateWindowEx(0, WC_STATIC, L"Hello WOrld", WS_CHILD | WS_VISIBLE, 10, 10, 50, 50, hwnd, (HMENU)100, hinst, nullptr);
         CreateChildren();
+        SendMessage(hwnd, WM_CHANGEUISTATE, (WPARAM)MAKELONG(UIS_SET, UISF_HIDEFOCUS), 0);
         break;
     case WM_SIZE:
         //this->ConfigureEnumChildWindows();
@@ -101,20 +106,29 @@ void WMain::MsgBox(const std::wstring& title, const std::wstring& msg)
 
 // find way to get call into wm_paint case in windowproc, add parameters and whether image or text into struct vect
 
-void WMain::Text(std::wstring txt, int x, int y, int w, int h)
+void WMain::Text(std::wstring txt, int x, int y, int w, int h, COLORREF txtcolor, std::wstring fontname, int fontsize) // create init fonts function! initialising every call is gonna fuck shit up
 {
+    HFONT font;
+    LONG lfHeight;
     HDC hdc = GetDC(hwnd);
+    lfHeight = -MulDiv(fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+    font = CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontname.c_str());
+    SelectObject(hdc, font);
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, txtcolor);
     RECT txtbox = { x,y,w,h };
-    DrawText(hdc, txt.c_str(), txt.length(), &txtbox, DT_CENTER );
+    DrawText(hdc, txt.c_str(), txt.length(), &txtbox, DT_LEFT );
 }
 
 void WMain::Image(std::wstring img, int x, int y, int w, int h){
-
+    Gdiplus::Graphics graphics(GetDC(hwnd)); 
+    Gdiplus::Image* image = new Gdiplus::Image(img.c_str());
+    graphics.DrawImage(image, x, y, w, h);
 }
 
-bool WMain::LoadBitmaps(){
-    LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BALL));
-}
+//bool WMain::LoadBitmaps(){
+//    LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BALL));
+//}
 
 //bool WMain::CreateChildren() {
 //    for (void* pchild : children) {
