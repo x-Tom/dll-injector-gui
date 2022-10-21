@@ -8,6 +8,14 @@ WComboBox::WComboBox(HINSTANCE hInst, HMENU id, int x, int y, int w, int h, std:
 bool WComboBox::Create(HWND parent)
 {
 	hwnd = CreateWindow(WC_COMBOBOX, L"", styles | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE, x, y, w, h, parent, NULL, hinst, NULL);
-	//SendMessage(hWndComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)A);
+	for (auto& str : list) {
+		SendMessage(hwnd, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)str.c_str());
+	}
+	SendMessage(hwnd, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 	return true;
+}
+
+LRESULT WComboBox::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return LRESULT();
 }
