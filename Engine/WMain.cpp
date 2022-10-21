@@ -66,13 +66,24 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         //     if(child.Handle() == lParam) pctl = child;
         // }
 
+    {
         // pctl->Background((HDC) wParam);
-        HDC hdcStatic = (HDC) wParam;
-        SetTextColor(hdcStatic, RGB(0,0,0));
+        HDC hdcStatic = (HDC)wParam;
+        SetTextColor(hdcStatic, RGB(0, 0, 0));
         SetBkMode(hdcStatic, TRANSPARENT);
         //return (INT_PTR)CreateSolidBrush(TRANSPARENT);
         return (INT_PTR)GetSysColor(COLOR_WINDOW);
         break;
+    }
+    case WM_CTLCOLORBTN:
+        SetTextColor((HDC)wParam, RGB(255, 0, 0));
+        SetBkColor((HDC)wParam, RGB(0, 0, 0));
+        SetBkMode((HDC)wParam, TRANSPARENT);
+        return(LRESULT)CreateSolidBrush(RGB(0, 0, 0));
+        break;
+    /*case WM_ERASEBKGND:
+        return 1;
+        break;*/
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }

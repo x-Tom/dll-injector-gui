@@ -9,6 +9,8 @@ public:
 	virtual bool Create(HWND) override;
 	WComboBox(const WComboBox&) = delete;
 	WComboBox& operator=(const WComboBox&) = delete;
+protected:
+	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 private:
 	std::vector<std::wstring> list;
 	LONG styles;
