@@ -9,6 +9,7 @@ public:
 	virtual bool Create(HWND) override;
 	WButton(const WButton&) = delete;
 	WButton& operator=(const WButton&) = delete;
+	LONG GetStyles();
 
 protected:
 	LONG styles;

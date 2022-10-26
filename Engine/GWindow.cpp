@@ -80,4 +80,9 @@ HWND GWindow::Handle()
     return hwnd;
 }
 
+LPCWSTR GWindow::GetClass()
+{
+    return wndClassName;
+}
+
 bool GWindow::LoadBitmaps(){return true;}

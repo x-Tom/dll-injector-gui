@@ -5,6 +5,10 @@ GChild::GChild(HINSTANCE hInst, LPCWSTR wndclassname, LPWNDCLASSEX pwc, HMENU id
 	
 }
 
+HMENU GChild::GetID() {
+    return id;
+}
+
 void GChild::setParent(HWND p) {
     parent = p;
 }

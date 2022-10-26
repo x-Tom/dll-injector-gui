@@ -148,25 +148,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DLLInject.cpp" />
     <ClCompile Include="GWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GChild.cpp" />
     <ClCompile Include="WButton.cpp" />
     <ClCompile Include="WComboBox.cpp" />
+    <ClCompile Include="WEdit.cpp" />
+    <ClCompile Include="winapi.cpp" />
     <ClCompile Include="WMain.cpp" />
     <ClCompile Include="GStatic.cpp" />
     <ClCompile Include="WText.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DLLInject.h" />
     <ClInclude Include="EngineWindow.h" />
     <ClInclude Include="GWindow.h" />
     <ClInclude Include="GChild.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="WButton.h" />
     <ClInclude Include="WComboBox.h" />
+    <ClInclude Include="WEdit.h" />
+    <ClInclude Include="winapi.h" />
     <ClInclude Include="WinHeader.h" />
     <ClInclude Include="WMain.h" />
     <ClInclude Include="GStatic.h" />
     <ClInclude Include="WText.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
