@@ -39,6 +39,15 @@
     <ClCompile Include="WComboBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WEdit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="winapi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DLLInject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineWindow.h">
@@ -68,5 +77,22 @@
     <ClInclude Include="WComboBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WEdit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DLLInject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="winapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

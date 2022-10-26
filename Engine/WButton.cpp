@@ -12,6 +12,11 @@ bool WButton::Create(HWND prnt){
     return true;
 }
 
+LONG WButton::GetStyles()
+{
+    return styles;
+}
+
 LRESULT WButton::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return LRESULT();

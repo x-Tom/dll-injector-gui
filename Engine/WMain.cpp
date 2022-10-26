@@ -1,5 +1,7 @@
 #include "WMain.h"
 #include "WText.h"
+#include "WButton.h"
+
 
 WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
 {
@@ -40,6 +42,7 @@ bool WMain::Create(HWND)
 
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
+    
 }
 
 LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -56,6 +59,41 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         //CreateWindowEx(0, WC_STATIC, L"Hello WOrld", WS_CHILD | WS_VISIBLE, 10, 10, 50, 50, hwnd, (HMENU)100, hinst, nullptr);
         CreateChildren();
         SendMessage(hwnd, WM_CHANGEUISTATE, (WPARAM)MAKELONG(UIS_SET, UISF_HIDEFOCUS), 0);
+        SetGlobalFont();
+        break;
+    case WM_COMMAND:
+        switch (HIWORD(wParam)) {
+        case BN_CLICKED:
+            switch (LOWORD(wParam)) {
+            case (int)RADIO1: //set injector to inject by process name
+                app->pnorid = true;
+                //loop through children if id is EDIT1 set active, if id EDIT2 set inactive
+                for (auto& chld : children) {
+                    if (static_cast<GChild*>(chld)->GetID() == EDIT1) EnableWindow(static_cast<GChild*>(chld)->Handle(), TRUE);
+                    if (static_cast<GChild*>(chld)->GetID() == EDIT2) EnableWindow(static_cast<GChild*>(chld)->Handle(), FALSE);
+                }
+                break;
+            case (int)RADIO2: //set injector to inject by pid
+                app->pnorid = false;
+                //loop through children if id is EDIT1 set inactive, if id EDIT2 set active
+                for (auto& chld : children) {
+                    if (static_cast<GChild*>(chld)->GetID() == EDIT2) EnableWindow(static_cast<GChild*>(chld)->Handle(), TRUE);
+                    if (static_cast<GChild*>(chld)->GetID() == EDIT1) EnableWindow(static_cast<GChild*>(chld)->Handle(), FALSE);
+                }
+                break;
+            }
+            break;
+        case CBN_SELCHANGE:
+            switch (LOWORD(wParam)) {
+            case (int)COMBOBOX1:
+                app->inj_load_idx = SendMessage((HWND)lParam, CB_GETCURSEL, NULL, NULL);
+                break;
+            case (int)COMBOBOX2:
+                app->inj_exec_idx = SendMessage((HWND)lParam, CB_GETCURSEL, NULL, NULL);
+                break;
+            }
+            break;
+        }
         break;
     case WM_SIZE:
         //this->ConfigureEnumChildWindows();
@@ -72,14 +110,16 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SetTextColor(hdcStatic, RGB(0, 0, 0));
         SetBkMode(hdcStatic, TRANSPARENT);
         //return (INT_PTR)CreateSolidBrush(TRANSPARENT);
-        return (INT_PTR)GetSysColor(COLOR_WINDOW);
+        //return (INT_PTR)GetSysColor(RGB(255,255,255));
+        //return (LRESULT)GetStockObject(NULL_BRUSH);
+        return (LRESULT)CreateSolidBrush(RGB(255, 255, 255));
         break;
     }
     case WM_CTLCOLORBTN:
         SetTextColor((HDC)wParam, RGB(255, 0, 0));
         SetBkColor((HDC)wParam, RGB(0, 0, 0));
         SetBkMode((HDC)wParam, TRANSPARENT);
-        return(LRESULT)CreateSolidBrush(RGB(0, 0, 0));
+        return(LRESULT)CreateSolidBrush(RGB(255, 255, 255));
         break;
     /*case WM_ERASEBKGND:
         return 1;
@@ -105,6 +145,27 @@ bool WMain::ProcessMessage()
     return true;
 }
 
+bool WMain::SetGlobalFont()
+{
+    AddFont(gfontname, gfontsize);
+    AddFont(gfontname + L" Bold", gfontsize + 1);
+    HFONT fntA = fonts.at(gfontname + L"\\" + std::to_wstring(gfontsize));
+    HFONT fntB= fonts.at(gfontname + L" Bold" + L"\\" + std::to_wstring(gfontsize + 1));
+    HFONT fnt;
+   
+    for (auto& child : children) {
+        fnt = fntA;
+        if (!lstrcmpW(WC_BUTTON, static_cast<GWindow*>(child)->GetClass())) {
+            LONG bstyles = static_cast<WButton*>(child)->GetStyles();
+            if ((bstyles & BS_GROUPBOX) == BS_GROUPBOX) fnt = fntB;
+        }
+            
+            //fnt = fntB : fnt = fntA;
+        SendMessage(static_cast<GWindow*>(child)->Handle(), WM_SETFONT, (LPARAM)fnt, (LPARAM)MAKELONG(TRUE, 0));
+    }
+    return false;
+}
+
 void WMain::Kill()
 {
     PostQuitMessage(0);
@@ -115,15 +176,40 @@ void WMain::MsgBox(const std::wstring& title, const std::wstring& msg)
     MessageBox(hwnd, title.c_str(), msg.c_str(), MB_OK);
 }
 
-// find way to get call into wm_paint case in windowproc, add parameters and whether image or text into struct vect
-
-void WMain::Text(std::wstring txt, int x, int y, int w, int h, COLORREF txtcolor, std::wstring fontname, int fontsize) // create init fonts function! initialising every call is gonna fuck shit up
+bool WMain::AddFont(std::wstring fontname, int fontsize)
 {
+    std::wstring tbhashed = fontname + L"\\" + std::to_wstring(fontsize);
+    if (fonts.find(tbhashed) != fonts.end()) return false;
+
     HFONT font;
     LONG lfHeight;
     HDC hdc = GetDC(hwnd);
     lfHeight = -MulDiv(fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
     font = CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontname.c_str());
+    
+    if (font != nullptr) {
+
+        fonts[tbhashed] = font;
+        return true;
+    }
+    else return false;
+    
+}
+
+// find way to get call into wm_paint case in windowproc, add parameters and whether image or text into struct vect
+
+void WMain::Text(std::wstring txt, int x, int y, int w, int h, COLORREF txtcolor, std::wstring fontname, int fontsize) // create init fonts function! initialising every call is gonna fuck shit up
+{
+    
+    std::wstring tbhashed = fontname + L"\\" + std::to_wstring(fontsize);
+
+    if (fonts.find(tbhashed) == fonts.end()) AddFont(fontname, fontsize);
+
+    HFONT font = fonts.at(tbhashed);
+    //HFONT font{};
+    HDC hdc = GetDC(hwnd);
+    //LONG lfHeight = -MulDiv(fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+    //font = CreateFont(lfHeight, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, fontname.c_str());
     SelectObject(hdc, font);
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, txtcolor);
@@ -131,9 +217,9 @@ void WMain::Text(std::wstring txt, int x, int y, int w, int h, COLORREF txtcolor
     DrawText(hdc, txt.c_str(), txt.length(), &txtbox, DT_LEFT );
 }
 
-void WMain::Image(std::wstring img, int x, int y, int w, int h){
+void WMain::Image(std::wstring img, int x, int y, int w, int h){ //Change to BITMAPS if you want bmp resource to be embedded into EXE
     Gdiplus::Graphics graphics(GetDC(hwnd)); 
-    Gdiplus::Image* image = new Gdiplus::Image(img.c_str());
+    Gdiplus::Image* image = new Gdiplus::Image(img.c_str(), TRUE);
     graphics.DrawImage(image, x, y, w, h);
 }
 
@@ -149,3 +235,8 @@ void WMain::Image(std::wstring img, int x, int y, int w, int h){
 //    // loop through children vec, if chidren vec has non nullptr element call create on it
 //    return true;
 //}
+
+
+void WMain::App(dllinject* a){
+    app = a;
+}

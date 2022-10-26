@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "WinHeader.h"
 #include <iostream>
 #include <map>
@@ -9,6 +10,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <vector>
+#include <unordered_map>
 
 #define MV_SCREENHEIGHT GetSystemMetrics(SM_CYVIRTUALSCREEN)
 #define MV_SCREENWIDTH GetSystemMetrics(SM_CXVIRTUALSCREEN)
@@ -27,6 +29,7 @@ public:
 	static BOOL INIT_COMMON_CONTROLS();
 	static BOOL INIT_GDIPLUS();
 	HWND Handle();
+	LPCWSTR GetClass();
 
 protected:
 	HWND hwnd;

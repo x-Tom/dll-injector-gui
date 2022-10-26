@@ -59,3 +59,5 @@
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment (lib,"Gdiplus.lib")
+
+
