@@ -3,5 +3,5 @@
 - Simple Class Wrapper over Win32 API for creation of windows and controls
 - DLL Proceess Injection with multiple methods of injection  
 
-![alt text]([https://github.com/x-Tom/DLLInjectorGUI/blob/mac-m1/Engine/dllinject592x128.png?raw=true])
+![alt text](https://github.com/x-Tom/DLLInjectorGUI/blob/mac-m1/Engine/dllinject592x128.png?raw=true)
 
