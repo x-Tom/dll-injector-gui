@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "WinHeader.h"
 #include <iostream>
 #include <map>
@@ -9,9 +10,10 @@
 #include <stdexcept>
 #include <cassert>
 #include <vector>
-#include <CommCtrl.h>
+#include <unordered_map>
 
-#pragma comment(lib, "comctl32.lib")
+#define MV_SCREENHEIGHT GetSystemMetrics(SM_CYVIRTUALSCREEN)
+#define MV_SCREENWIDTH GetSystemMetrics(SM_CXVIRTUALSCREEN)
 
 class GWindow
 {
@@ -23,9 +25,11 @@ public:
 	virtual bool Add(void*);
 	GWindow(const GWindow&) = delete;
 	GWindow& operator=(const GWindow&) = delete;
-	
-	static BOOL initCC();
+	virtual bool LoadBitmaps();
+	static BOOL INIT_COMMON_CONTROLS();
+	static BOOL INIT_GDIPLUS();
 	HWND Handle();
+	LPCWSTR GetClass();
 
 protected:
 	HWND hwnd;

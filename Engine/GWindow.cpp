@@ -61,14 +61,28 @@ bool GWindow::Add(void* pchild) {
 
 
 
-BOOL GWindow::initCC() {
+BOOL GWindow::INIT_COMMON_CONTROLS() {
     INITCOMMONCONTROLSEX iccex;
     iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     iccex.dwICC = ICC_LISTVIEW_CLASSES;
     return InitCommonControlsEx(&iccex);
 }
 
+BOOL GWindow::INIT_GDIPLUS()
+{
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    return Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+}
+
 HWND GWindow::Handle()
 {
     return hwnd;
 }
+
+LPCWSTR GWindow::GetClass()
+{
+    return wndClassName;
+}
+
+bool GWindow::LoadBitmaps(){return true;}
