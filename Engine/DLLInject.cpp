@@ -1,29 +1,54 @@
 #include "DLLInject.h"
 
-dllinject::dllinject() : pnorid{}, inj_exec_idx{}, inj_load_idx{}, dllrpath{}, procname{}, procid{} {
-	wchar_t szFile = new wchar_t[MAX_PATH];
-	wchar_t szFileTitle = new wchar_t[MAX_PATH];
-	HWND ohwnd;
+dllinject::dllinject() : pnorid{ true }, inj_exec_idx{ 0 }, inj_load_idx{ 0 }, dllrpath{}, procname{}, procid{0} {
+	//wchar_t* szFile = new wchar_t[MAX_PATH];
+	//wchar_t* szFileTitle = new wchar_t[MAX_PATH];
+	//HWND ohwnd = nullptr;
+
+	//ZeroMemory(szFile, MAX_PATH);
+	//ZeroMemory(szFileTitle, MAX_PATH);
+
+	//ZeroMemory(&opfn, sizeof(opfn));
+	//opfn.lStructSize = sizeof(opfn);
+	//opfn.hwndOwner = ohwnd;
+	//opfn.lpstrFile = szFile;
+	//opfn.lpstrFile[0] = '\0';
+	//opfn.nMaxFile = MAX_PATH;
+	//opfn.lpstrFilter = L"DLL\0*.DLL\0\0";
+	//opfn.nFilterIndex = 1;
+	//opfn.lpstrFileTitle = szFileTitle;
+	//opfn.nMaxFileTitle = MAX_PATH;
+	//opfn.lpstrInitialDir = NULL;
+	//opfn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	//opfninit();
+
+}
+
+void dllinject::opfninit() {
+	wchar_t* szFile = new wchar_t[MAX_PATH];
+	wchar_t* szFileTitle = new wchar_t[MAX_PATH];
+	HWND ohwnd = nullptr;
+
+	ZeroMemory(szFile, MAX_PATH);
+	ZeroMemory(szFileTitle, MAX_PATH);
 
 	ZeroMemory(&opfn, sizeof(opfn));
 	opfn.lStructSize = sizeof(opfn);
 	opfn.hwndOwner = ohwnd;
 	opfn.lpstrFile = szFile;
 	opfn.lpstrFile[0] = '\0';
-	opfn.nMaxFile = sizeof(szFile);
-	opfn.lpstrFilter = "DLL\0*.DLL\0\0";
+	opfn.nMaxFile = MAX_PATH;
+	opfn.lpstrFilter = L"DLL\0*.DLL\0\0";
 	opfn.nFilterIndex = 1;
 	opfn.lpstrFileTitle = szFileTitle;
-	opfn.nMaxFileTitle = sizeof(szFileTitle);
+	opfn.nMaxFileTitle = MAX_PATH;
 	opfn.lpstrInitialDir = NULL;
 	opfn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
 }
-
 
 DWORD dllinject::inject(){
 
-	HANDLE proc = (pnorid) ? winapi::findProcess(procname) : winapi::findProcess(procid);
+	HANDLE proc = (pnorid) ? winapi::findProcess(procname.c_str()) : winapi::findProcess(procid);
 
 	DWORD opts = 0;
 

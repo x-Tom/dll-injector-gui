@@ -1,6 +1,6 @@
 #include "WEdit.h"
 
-WEdit::WEdit(HINSTANCE hInst, HMENU id, int x, int y, int w, int h, LONG styles, BOOL active) : GChild(hInst, WC_COMBOBOX, nullptr, id, x, y, w, h), styles(styles)
+WEdit::WEdit(HINSTANCE hInst, HMENU id, int x, int y, int w, int h, LONG styles, BOOL active) : GChild(hInst, WC_COMBOBOX, nullptr, id, x, y, w, h), styles(styles), active(active)
 {
 
 }

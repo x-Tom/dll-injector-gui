@@ -12,6 +12,7 @@ protected:
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 private:
 	LONG styles;
+	BOOL active;
 
 };
 

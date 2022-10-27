@@ -60,9 +60,11 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SendMessage(hwnd, WM_CHANGEUISTATE, (WPARAM)MAKELONG(UIS_SET, UISF_HIDEFOCUS), 0);
         SetGlobalFont();
 
-        if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
-            EnableWindow(static_cast<GChild*>(chld)->Handle(), FALSE);
-        }
+       /* for (auto& chld : children) {
+            if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
+                EnableWindow(static_cast<GChild*>(chld)->Handle(), FALSE);
+            }
+        }*/
 
         break;
     case WM_COMMAND:
@@ -70,15 +72,15 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case BN_CLICKED:
             switch (LOWORD(wParam)) {
             case (int)BUTTONFILE:
-                if(GetOpenFileName(&app->opfn) == TRUE){
-                    for (auto& chld : children) {
-                        if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
-                            SetWindowText(tatic_cast<GChild*>(chld)->Handle(), opfn->lpstrFileTitle);
-                        }
+                app->opfninit();
+                GetOpenFileName(&app->opfn);
+                for (auto& chld : children) {
+                    if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
+                        SetWindowText(static_cast<GChild*>(chld)->Handle(), app->opfn.lpstrFileTitle);
+                        //MessageBox(NULL, app->opfn.lpstrFile, NULL, MB_OK);
+                        //OutputDebugString(app->opfn.lpstrFile);
                     }
-                };
-
-               
+                }
                 break;
             case (int)BUTTONINJ:
                 app->inject();

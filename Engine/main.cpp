@@ -25,12 +25,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WButton Radio1(hInstance, RADIO1, 15, 125, 80, 20, L"Process:", BS_AUTORADIOBUTTON | BS_LEFTTEXT | WS_GROUP);
     WButton Radio2(hInstance, RADIO2, 15, 155, 80, 20, L"PID:", BS_AUTORADIOBUTTON | BS_LEFTTEXT);
     
-    WText Text(hInstance, (HMENU)111, 16, 185, 80, 20, L"DLL: ");
-    WButton ButtonF(hInstance, BUTTONFILE, 100, 185, 40, 20, L"Choose", BS_PUSHBUTTON | BS_FLAT);
+    WText Text(hInstance, (HMENU)111, 16, 185, 27, 20, L"DLL:");
+    
 
     WEdit Edit1(hInstance, EDIT1, 110, 124, 180, 20);
     WEdit Edit2(hInstance, EDIT2, 110, 154, 180, 20);
-    WEdit Edit3(hInstance, EDIT2, 110, 184, 180, 20, ES_LEFT, FALSE);
+    WEdit Edit3(hInstance, EDIT3, 110, 184, 180, 20);
+
+    WButton ButtonF(hInstance, BUTTONFILE, 50, 184, 55, 20, L"Choose", BS_PUSHBUTTON | BS_FLAT);
 
     WButton   GroupBoxINJ(hInstance, GROUPBOX2, 15, 220, 200, 100, L"Method of Injection", BS_GROUPBOX);
     WComboBox ComboBoxINJ1(hInstance, COMBOBOX1, 25, 250, 180, 400, inj1, CBS_DROPDOWNLIST | CBS_HASSTRINGS);

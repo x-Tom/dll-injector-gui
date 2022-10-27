@@ -1,5 +1,6 @@
 #pragma once
 #include "WinHeader.h"
+#include "winapi.h"
 #include <iostream>
 
 class dllinject {
@@ -15,7 +16,9 @@ public:
 		QUEUEUSERAPC
 	};
 
-	dllinject() = default;
+	//dllinject() = default;
+	dllinject();
+	void opfninit();
 	~dllinject() = default;
 	dllinject(const dllinject&) = delete;
 	dllinject& operator=(const dllinject&) = delete;
