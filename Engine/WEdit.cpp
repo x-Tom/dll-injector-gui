@@ -1,6 +1,6 @@
 #include "WEdit.h"
 
-WEdit::WEdit(HINSTANCE hInst, HMENU id, int x, int y, int w, int h, LONG styles) : GChild(hInst, WC_COMBOBOX, nullptr, id, x, y, w, h), styles(styles)
+WEdit::WEdit(HINSTANCE hInst, HMENU id, int x, int y, int w, int h, LONG styles, BOOL active) : GChild(hInst, WC_COMBOBOX, nullptr, id, x, y, w, h), styles(styles)
 {
 
 }
@@ -15,6 +15,8 @@ bool WEdit::Create(HWND prnt)
         (HMENU)id,
         hinst,
         NULL);
+
+    if (!active) EnableWindow(hwnd, FALSE);
 
     return (hwnd != nullptr);
 }

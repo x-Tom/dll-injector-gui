@@ -5,6 +5,7 @@
 
 
 #define BUTTONINJ (HMENU)0100
+#define BUTTONFILE (HMENU)101
 #define RADIO1    (HMENU)1000
 #define RADIO2    (HMENU)1001
 #define EDIT1	  (HMENU)2000

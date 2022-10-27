@@ -32,6 +32,8 @@ public:
 	int inj_load_idx;
 	int inj_exec_idx;
 
+	OPENFILENAME opfn;
+
 	std::wstring dllrpath;
 	std::wstring procname;
 	DWORD procid;
@@ -40,6 +42,7 @@ public:
 
 private:
 	
-	static DWORD _inject(std::wstring, HANDLE, DWORD);
+	static DWORD _injectfpath(LPWSTR, HANDLE, DWORD);
+	static DWORD _injectrpath(std::wstring, HANDLE, DWORD);
 	
 };

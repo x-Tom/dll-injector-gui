@@ -2,7 +2,7 @@
 #include "GChild.h"
 class WEdit : public GChild {
 public:
-	WEdit(HINSTANCE, HMENU, int, int, int, int, LONG = ES_LEFT);
+	WEdit(HINSTANCE, HMENU, int, int, int, int, LONG = ES_LEFT, BOOL = TRUE);
 	WEdit() = default;
 	~WEdit() = default;
 	virtual bool Create(HWND) override;

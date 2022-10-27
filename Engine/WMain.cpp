@@ -47,8 +47,7 @@ bool WMain::Create(HWND)
 
 LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    switch (msg) {
     case WM_DESTROY:
         Kill();
         break;
@@ -60,11 +59,27 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         CreateChildren();
         SendMessage(hwnd, WM_CHANGEUISTATE, (WPARAM)MAKELONG(UIS_SET, UISF_HIDEFOCUS), 0);
         SetGlobalFont();
+
+        if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
+            EnableWindow(static_cast<GChild*>(chld)->Handle(), FALSE);
+        }
+
         break;
     case WM_COMMAND:
         switch (HIWORD(wParam)) {
         case BN_CLICKED:
             switch (LOWORD(wParam)) {
+            case (int)BUTTONFILE:
+                if(GetOpenFileName(&app->opfn) == TRUE){
+                    for (auto& chld : children) {
+                        if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
+                            SetWindowText(tatic_cast<GChild*>(chld)->Handle(), opfn->lpstrFileTitle);
+                        }
+                    }
+                };
+
+               
+                break;
             case (int)BUTTONINJ:
                 app->inject();
                 break;
@@ -101,14 +116,15 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             LPWSTR str = (LPWSTR)malloc(len);
             GetWindowText((HWND)lParam, str, len);
             switch (LOWORD(wParam)) {
-                case (int)EDIT1:
-                    app->procname = str;
+            case (int)EDIT1:
+                app->procname = str;
                 break;
-                case (int)EDIT2:
-                    app->procid = (DWORD)_wtoi(str);
-                break;
-                case (int)EDIT3: 
-                    app->dllrpath = str; 
+            case (int)EDIT2:
+                app->procid = (DWORD)_wtoi(str);
+            break;
+            // case (int)EDIT3: 
+            //     app->dllrpath = str;
+            //     break;
             }
             break;
         }
@@ -116,12 +132,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         //this->ConfigureEnumChildWindows();
         break;
-    case WM_CTLCOLORSTATIC: // IDEALLY WE DONT WANT TO USE WC_STATIC CONTROL CHILD WINDOWS!!
-        // void* pctl;
-        // for(auto child : children){
-        //     if(child.Handle() == lParam) pctl = child;
-        // }
-
+    case WM_CTLCOLORSTATIC:
     {
         // pctl->Background((HDC) wParam);
         HDC hdcStatic = (HDC)wParam;

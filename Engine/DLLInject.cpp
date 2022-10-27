@@ -1,5 +1,26 @@
 #include "DLLInject.h"
 
+dllinject::dllinject() : pnorid{}, inj_exec_idx{}, inj_load_idx{}, dllrpath{}, procname{}, procid{} {
+	wchar_t szFile = new wchar_t[MAX_PATH];
+	wchar_t szFileTitle = new wchar_t[MAX_PATH];
+	HWND ohwnd;
+
+	ZeroMemory(&opfn, sizeof(opfn));
+	opfn.lStructSize = sizeof(opfn);
+	opfn.hwndOwner = ohwnd;
+	opfn.lpstrFile = szFile;
+	opfn.lpstrFile[0] = '\0';
+	opfn.nMaxFile = sizeof(szFile);
+	opfn.lpstrFilter = "DLL\0*.DLL\0\0";
+	opfn.nFilterIndex = 1;
+	opfn.lpstrFileTitle = szFileTitle;
+	opfn.nMaxFileTitle = sizeof(szFileTitle);
+	opfn.lpstrInitialDir = NULL;
+	opfn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+}
+
+
 DWORD dllinject::inject(){
 
 	HANDLE proc = (pnorid) ? winapi::findProcess(procname) : winapi::findProcess(procid);
@@ -18,11 +39,42 @@ DWORD dllinject::inject(){
 			break;
 	}
 
-	return dllinject::_inject(dllrpath, proc, opts);
+	return dllinject::_injectfpath(opfn.lpstrFile, proc, opts);
+}
+
+DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
+	void* dllpath_address = VirtualAllocEx(process, 0, wcslen(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
+	int write_status = WriteProcessMemory(process, dllpath_address, dllpath, wcslen(dllpath), NULL);  // may need to put this in switch
+	//if (!write_status) return 1;
+	DWORD dword;
+	LPVOID funcpointer = nullptr;
+	HANDLE hthread;
+
+	switch (options & 0xffff) {
+	case LOADLIBRARYEXW:
+		
+		funcpointer = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "LoadLibraryW");
+		if (funcpointer == nullptr) return 1;
+		break;
+	}
+
+	switch (options & (0xffff << 16)) {
+	case CREATEREMOTETHREADEX:
+
+		hthread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)funcpointer, dllpath_address, 0, &dword);
+		break;
+	}
+
+
+	
+	
+	//if()
+
+	return 0;
 }
 
 
-DWORD dllinject::_inject(std::wstring dll, HANDLE process, DWORD options) {
+DWORD dllinject::_injectrpath(std::wstring dll, HANDLE process, DWORD options) {
 	wchar_t dllpath[100] = { 0 };
 	GetFullPathName(dll.c_str(), 13, dllpath, NULL);
 	void* dllpath_address = VirtualAllocEx(process, 0, wcslen(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
