@@ -1,6 +1,28 @@
 #include "DLLInject.h"
 
-DWORD dllinject::inject(std::wstring dll, HANDLE process, DWORD options) {
+DWORD dllinject::inject(){
+
+	HANDLE proc = (pnorid) ? winapi::findProcess(procname) : winapi::findProcess(procid);
+
+	DWORD opts = 0;
+
+	switch(inj_load_idx){
+		case 0:
+			opts |= LOADLIBRARYEXW;
+			break;
+	}
+
+	switch(inj_exec_idx){
+		case 0:
+			opts |= CREATEREMOTETHREADEX;
+			break;
+	}
+
+	return dllinject::_inject(dllrpath, proc, opts);
+}
+
+
+DWORD dllinject::_inject(std::wstring dll, HANDLE process, DWORD options) {
 	wchar_t dllpath[100] = { 0 };
 	GetFullPathName(dll.c_str(), 13, dllpath, NULL);
 	void* dllpath_address = VirtualAllocEx(process, 0, wcslen(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch

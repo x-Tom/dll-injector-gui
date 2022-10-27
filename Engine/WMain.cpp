@@ -65,6 +65,9 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         switch (HIWORD(wParam)) {
         case BN_CLICKED:
             switch (LOWORD(wParam)) {
+            case (int)BUTTONINJ:
+                app->inject();
+                break;
             case (int)RADIO1: //set injector to inject by process name
                 app->pnorid = true;
                 //loop through children if id is EDIT1 set active, if id EDIT2 set inactive
@@ -91,6 +94,21 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             case (int)COMBOBOX2:
                 app->inj_exec_idx = SendMessage((HWND)lParam, CB_GETCURSEL, NULL, NULL);
                 break;
+            }
+            break;
+        case EN_CHANGE:
+            int len = GetWindowTextLength((HWND)lParam);
+            LPWSTR str = (LPWSTR)malloc(len);
+            GetWindowText((HWND)lParam, str, len);
+            switch (LOWORD(wParam)) {
+                case (int)EDIT1:
+                    app->procname = str;
+                break;
+                case (int)EDIT2:
+                    app->procid = (DWORD)_wtoi(str);
+                break;
+                case (int)EDIT3: 
+                    app->dllrpath = str; 
             }
             break;
         }
@@ -196,7 +214,7 @@ bool WMain::AddFont(std::wstring fontname, int fontsize)
     
 }
 
-// find way to get call into wm_paint case in windowproc, add parameters and whether image or text into struct vect
+// ? find way to get call into wm_paint case in windowproc, add parameters and whether image or text into struct vect
 
 void WMain::Text(std::wstring txt, int x, int y, int w, int h, COLORREF txtcolor, std::wstring fontname, int fontsize) // create init fonts function! initialising every call is gonna fuck shit up
 {
@@ -225,15 +243,6 @@ void WMain::Image(std::wstring img, int x, int y, int w, int h){ //Change to BIT
 
 //bool WMain::LoadBitmaps(){
 //    LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BALL));
-//}
-
-//bool WMain::CreateChildren() {
-//    for (void* pchild : children) {
-//        if (pchild == nullptr) continue;
-//        ((WText*)pchild)->Create();
-//    }
-//    // loop through children vec, if chidren vec has non nullptr element call create on it
-//    return true;
 //}
 
 

@@ -26,7 +26,7 @@ public:
 	//int INJLoadGet();
 	//int INJExecGet();
 
-	DWORD inject(std::wstring, HANDLE, DWORD);
+	DWORD inject();
 
 	bool pnorid; // true for proc name false for proc id;
 	int inj_load_idx;
@@ -40,6 +40,6 @@ public:
 
 private:
 	
-	
+	static DWORD _inject(std::wstring, HANDLE, DWORD);
 	
 };
