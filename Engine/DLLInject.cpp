@@ -47,9 +47,19 @@ void dllinject::opfninit() {
 }
 
 DWORD dllinject::inject(){
+	wchar_t buf[MAX_PATH] = {0};
+	wcscat_s(buf, L"Couldnt find process: ");
+	wcscat_s(buf, procname);
+	wcscat_s(buf, L" PID: ");
+	wcscat_s(buf, procid);
+	wcscat_s(buf, L" DLL to inject (file title): ");
+	wcscat_s(buf, opfn.lpstrFileTitle);
+	wcscat_s(buf, L" (file full path): ");
+	wcscat_s(buf, opfn.lpstrFile);
 
-	HANDLE proc = (pnorid) ? winapi::findProcess(procname.c_str()) : winapi::findProcess(procid);
-
+	DWORD pid = _wtoi(procid);
+	HANDLE proc = (pnorid) ? winapi::findProcess(procname) : winapi::findProcess(pid);
+	if (proc == NULL) MessageBox(NULL, buf, L"Injection Failed", NULL);
 	DWORD opts = 0;
 
 	switch(inj_load_idx){
@@ -69,27 +79,53 @@ DWORD dllinject::inject(){
 
 DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 	void* dllpath_address = VirtualAllocEx(process, 0, wcslen(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
+	wchar_t buf[MAX_PATH] = { 0 };
+	wsprintf(buf, L"DLL file path: %s\n", dllpath, process);
+	OutputDebugString(buf);
+	wsprintf(buf, L"Remote Process Handle: %x\n", process);
+	OutputDebugString(buf);
+	wsprintf(buf, L"DLL file path string parameter address in target process: %x\n", dllpath_address);
+	OutputDebugString(buf);
+	if (dllpath_address == nullptr) {
+		MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
+		return 1;
+	}
 	int write_status = WriteProcessMemory(process, dllpath_address, dllpath, wcslen(dllpath), NULL);  // may need to put this in switch
-	//if (!write_status) return 1;
+	if (write_status == FALSE) {
+		MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
+		return 1;
+	}
 	DWORD dword;
 	LPVOID funcpointer = nullptr;
-	HANDLE hthread;
+	HANDLE hthread = nullptr;
 
 	switch (options & 0xffff) {
 	case LOADLIBRARYEXW:
 		
 		funcpointer = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "LoadLibraryW");
-		if (funcpointer == nullptr) return 1;
+		if (funcpointer == nullptr) {
+			MessageBox(NULL, L"Failed to load LoadLibraryW", L"Injection Failed", NULL);
+			return 1;
+		}
 		break;
 	}
+
+	wsprintf(buf, L"LoadLibraryW Function Pointer: %x\n", funcpointer);
+	OutputDebugString(buf);
 
 	switch (options & (0xffff << 16)) {
 	case CREATEREMOTETHREADEX:
 
 		hthread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)funcpointer, dllpath_address, 0, &dword);
+		if (hthread == nullptr) {
+			MessageBox(NULL, L"Failed to Create Remote Thread", L"Injection Failed", NULL);
+			return 1;
+		}
 		break;
 	}
 
+	wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
+	OutputDebugString(buf);
 
 	
 	

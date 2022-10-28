@@ -37,9 +37,9 @@ public:
 
 	OPENFILENAME opfn;
 
-	std::wstring dllrpath;
-	std::wstring procname;
-	DWORD procid;
+	wchar_t dllrpath[MAX_PATH];
+	wchar_t procname[MAX_PATH];
+	wchar_t procid[MAX_PATH];
 	
 
 

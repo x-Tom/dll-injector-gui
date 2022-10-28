@@ -114,16 +114,14 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             break;
         case EN_CHANGE:
-            int len = GetWindowTextLength((HWND)lParam);
-            LPWSTR str = (LPWSTR)malloc(len);
-            GetWindowText((HWND)lParam, str, len);
+            int len = GetWindowTextLength((HWND)lParam) + 1;
             switch (LOWORD(wParam)) {
             case (int)EDIT1:
-                app->procname = str;
+                GetWindowText((HWND)lParam, app->procname, len);
                 break;
             case (int)EDIT2:
-                app->procid = (DWORD)_wtoi(str);
-            break;
+                GetWindowText((HWND)lParam, app->procid, len);
+                break;
             // case (int)EDIT3: 
             //     app->dllrpath = str;
             //     break;
