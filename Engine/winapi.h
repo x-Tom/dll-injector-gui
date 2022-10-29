@@ -3,7 +3,11 @@
 #include "WinHeader.h"
 #include <tlhelp32.h>
 
+#define wcsbytes(x) (wcslen(x)+1)*2
+
 namespace winapi {
+
+
 
 	enum PROCFIND {
 		CREATETOOLHELP32SNAPSHOT = 0
