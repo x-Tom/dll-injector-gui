@@ -3,6 +3,10 @@
 #include "winapi.h"
 #include <iostream>
 
+
+#define wcsbytes(x) (wcslen(x)+1)*2
+
+
 class dllinject {
 
 public:

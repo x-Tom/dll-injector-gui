@@ -48,6 +48,9 @@
     <ClCompile Include="DLLInject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WProcessListView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineWindow.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WProcessListView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
