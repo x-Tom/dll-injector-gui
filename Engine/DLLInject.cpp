@@ -78,7 +78,7 @@ DWORD dllinject::inject(){
 }
 
 DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
-	void* dllpath_address = VirtualAllocEx(process, 0, wcslen(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
+	void* dllpath_address = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
 	wchar_t buf[MAX_PATH] = { 0 };
 	wsprintf(buf, L"DLL file path: %s\n", dllpath, process);
 	OutputDebugString(buf);
@@ -90,7 +90,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
 		return 1;
 	}
-	int write_status = WriteProcessMemory(process, dllpath_address, dllpath, wcslen(dllpath), NULL);  // may need to put this in switch
+	int write_status = WriteProcessMemory(process, dllpath_address, dllpath, wcsbytes(dllpath), NULL);  // may need to put this in switch
 	if (write_status == FALSE) {
 		MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
 		return 1;
