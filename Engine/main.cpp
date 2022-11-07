@@ -5,6 +5,7 @@
 #include "WComboBox.h"
 #include "WEdit.h"
 #include "WText.h"
+#include "WProcessListView.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
@@ -38,6 +39,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WComboBox ComboBoxINJ1(hInstance, COMBOBOX1, 25, 250, 180, 400, inj1, CBS_DROPDOWNLIST | CBS_HASSTRINGS);
     WComboBox ComboBoxINJ2(hInstance, COMBOBOX2, 25, 280, 180, 400, inj2, CBS_DROPDOWNLIST | CBS_HASSTRINGS);
 
+    std::vector<std::wstring> columns = {L"Process",L"PID"};
+    WProcessListView ProcessList(hInstance, LISTVIEW1, width/2, 100, 300, 300, columns);
+
     MainWindow.Add(&Button);
     MainWindow.Add(&ButtonF);
     MainWindow.Add(&Radio1);
@@ -50,6 +54,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MainWindow.Add(&GroupBoxINJ);
     MainWindow.Add(&ComboBoxINJ1);
     MainWindow.Add(&ComboBoxINJ2);
+    MainWindow.Add(&ProcessList);
 
     std::wstring info = L"Width: " + std::to_wstring(width) + L"\nHeight: " + std::to_wstring(height);
     
@@ -62,6 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
            
     // no resizing WM_RESIZE listener
 
+    
 
     while (MainWindow.ProcessMessage());
 

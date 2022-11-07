@@ -1,12 +1,23 @@
 #pragma once
 #include "GChild.h"
 
+struct PROCITEM {
+	unsigned int index;
+	std::wstring item_name;
+	std::wstring subitem_name;
+	HICON icon;
+};
+
 class WProcessListView : public GChild {
 public:
-    WProcessListView(HINSTANCE, HMENU, int, int, int, int, std::vector<std::wstring>, LONG);
+    WProcessListView(HINSTANCE, HMENU, int, int, int, int, std::vector<std::wstring>, LONG = 0);
     
 	virtual bool Create(HWND) override;
-	
+	bool Update();
+
+	BOOL InitListViewColumns();
+	void ClearItems();
+	bool AddItem(std::wstring, std::wstring, HICON);
 	// bool Update();
 
 	WProcessListView() = default;
@@ -15,13 +26,9 @@ public:
 	WProcessListView& operator=(const WProcessListView&) = delete;
 protected:
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
-	
 	std::vector<std::wstring> column_names;
-	std::vector<std::wstring> item_names;
-
-	std::vector<LVITEM> items;
+	std::unordered_map<std::wstring, PROCITEM> process_items;
 	HIMAGELIST image_list;
-
 	LONG styles;
 };
 

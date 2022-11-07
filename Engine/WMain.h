@@ -15,6 +15,7 @@
 #define GROUPBOX2 (HMENU)3001
 #define COMBOBOX1 (HMENU)4000
 #define COMBOBOX2 (HMENU)4001
+#define LISTVIEW1 (HMENU)5000
 
 class WMain : public GWindow
 {
