@@ -1,6 +1,7 @@
 #include "WMain.h"
 #include "WText.h"
 #include "WButton.h"
+#include "WProcessListView.h"
 
 
 WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
@@ -47,6 +48,7 @@ bool WMain::Create(HWND)
 
 LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    
     switch (msg) {
     case WM_DESTROY:
         Kill();
@@ -66,6 +68,35 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
         }*/
 
+        break;
+    case WM_NOTIFY:
+        switch((LPNMHDR)lParam->code){
+            case NM_CLICK:
+                auto lpnmitem = (LPNMITEMACTIVATE) lParam;
+                std::wstring exe;
+                std::wstring pid;
+                for (auto& chld : children) {
+                    HMENU id = static_cast<GChild*>(chld)->GetID();
+                    if(id == LISTVIEW1) {
+                        for(auto& [key,val] : static_cast<WProcessListView*>(chld)->process_items){
+                            if(val.index == lpnmitem->iItem) {
+                                exe = key;
+                                pid = val.subitem_name;
+                            }
+                        }
+                    }
+                }
+                for (auto& chld : children) {
+                    HMENU id = static_cast<GChild*>(chld)->GetID();
+                    if (id == EDIT1) {
+                        SetWindowText(static_cast<GChild*>(chld)->Handle(), exe.c_str());
+                    }
+                    if (id == EDIT2) {
+                        SetWindowText(static_cast<GChild*>(chld)->Handle(), pid.c_str());
+                    }
+                }
+            break;
+        }
         break;
     case WM_COMMAND:
         switch (HIWORD(wParam)) {

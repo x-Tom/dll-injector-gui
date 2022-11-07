@@ -26,11 +26,12 @@ public:
 	~WProcessListView() = default;
 	WProcessListView(const WProcessListView&) = delete;
 	WProcessListView& operator=(const WProcessListView&) = delete;
+
+	std::unordered_map<std::wstring, PROCITEM> process_items;
 protected:
 	int index = 0;
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 	std::vector<std::wstring> column_names;
-	std::unordered_map<std::wstring, PROCITEM> process_items;
 	HIMAGELIST image_list;
 	LONG styles;
 };
