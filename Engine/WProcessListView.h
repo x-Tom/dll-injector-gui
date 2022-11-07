@@ -1,6 +1,6 @@
 #pragma once
 #include "GChild.h"
-#include "winapi.h"
+#include "winutils.h"
 
 struct PROCITEM {
 	unsigned int index;

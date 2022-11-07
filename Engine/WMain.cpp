@@ -34,7 +34,7 @@ bool WMain::Create(HWND)
         0, wndClassName,
         title.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
         x, y, w, h,
-        nullptr, nullptr, hinst, this // pass in this to WinAPI so it can get access to member function from static function
+        nullptr, nullptr, hinst, this // pass in this to winutils so it can get access to member function from static function
     );
 
     if (hwnd == nullptr) {

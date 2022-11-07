@@ -1,7 +1,7 @@
-#include "winapi.h"
+#include "winutils.h"
 
 
-void* winapi::ProcFindFuncSwitch(LONG options) {
+void* winutils::ProcFindFuncSwitch(LONG options) {
 	void* function = nullptr;
 	switch (options) {
 	case PROCFIND::CREATETOOLHELP32SNAPSHOT:
@@ -12,12 +12,12 @@ void* winapi::ProcFindFuncSwitch(LONG options) {
 };
 
 
-HANDLE winapi::findProcess(DWORD pid, LONG options) {
+HANDLE winutils::findProcess(DWORD pid, LONG options) {
 	void* function = ProcFindFuncSwitch(options);
 	return ((HANDLE(*)(const wchar_t*, DWORD))function)(nullptr, pid);
 }
 
-HANDLE winapi::findProcess(const wchar_t* processName, LONG options) {
+HANDLE winutils::findProcess(const wchar_t* processName, LONG options) {
 	void* function = ProcFindFuncSwitch(options);
 	return ((HANDLE(*)(const wchar_t*, DWORD))function)(processName, NULL);
 }
@@ -26,7 +26,7 @@ HANDLE winapi::findProcess(const wchar_t* processName, LONG options) {
 
 
 
-HANDLE winapi::_findProcess_ctlh32s(const wchar_t* processName, const DWORD pid)
+HANDLE winutils::_findProcess_ctlh32s(const wchar_t* processName, const DWORD pid)
 {
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
@@ -86,7 +86,7 @@ HANDLE winapi::_findProcess_ctlh32s(const wchar_t* processName, const DWORD pid)
 }
 
 
-HWND winapi::find_main_window(DWORD process_id)
+HWND winutils::find_main_window(DWORD process_id)
 {
 	handle_data data;
 	data.process_id = process_id;
@@ -95,7 +95,7 @@ HWND winapi::find_main_window(DWORD process_id)
 	return data.window_handle;
 }
 
-BOOL CALLBACK winapi::enum_windows_callback(HWND handle, LPARAM lParam)
+BOOL CALLBACK winutils::enum_windows_callback(HWND handle, LPARAM lParam)
 {
 	handle_data& data = *(handle_data*)lParam;
 	unsigned long process_id = 0;
@@ -106,7 +106,7 @@ BOOL CALLBACK winapi::enum_windows_callback(HWND handle, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL winapi::is_main_window(HWND handle)
+BOOL winutils::is_main_window(HWND handle)
 {
 	return GetWindow(handle, GW_OWNER) == (HWND)0;
 }

@@ -1,28 +1,6 @@
 #include "DLLInject.h"
 
-dllinject::dllinject() : pnorid{ true }, inj_exec_idx{ 0 }, inj_load_idx{ 0 }, dllrpath{}, procname{}, procid{0} {
-	//wchar_t* szFile = new wchar_t[MAX_PATH];
-	//wchar_t* szFileTitle = new wchar_t[MAX_PATH];
-	//HWND ohwnd = nullptr;
-
-	//ZeroMemory(szFile, MAX_PATH);
-	//ZeroMemory(szFileTitle, MAX_PATH);
-
-	//ZeroMemory(&opfn, sizeof(opfn));
-	//opfn.lStructSize = sizeof(opfn);
-	//opfn.hwndOwner = ohwnd;
-	//opfn.lpstrFile = szFile;
-	//opfn.lpstrFile[0] = '\0';
-	//opfn.nMaxFile = MAX_PATH;
-	//opfn.lpstrFilter = L"DLL\0*.DLL\0\0";
-	//opfn.nFilterIndex = 1;
-	//opfn.lpstrFileTitle = szFileTitle;
-	//opfn.nMaxFileTitle = MAX_PATH;
-	//opfn.lpstrInitialDir = NULL;
-	//opfn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-	//opfninit();
-
-}
+dllinject::dllinject() : pnorid{ true }, inj_exec_idx{ 0 }, inj_load_idx{ 0 }, dllrpath{}, procname{}, procid{0} {}
 
 void dllinject::opfninit() {
 	wchar_t* szFile = new wchar_t[MAX_PATH];
@@ -58,7 +36,7 @@ DWORD dllinject::inject(){
 	wcscat_s(buf, opfn.lpstrFile);
 
 	DWORD pid = _wtoi(procid);
-	HANDLE proc = (pnorid) ? winapi::findProcess(procname) : winapi::findProcess(pid);
+	HANDLE proc = (pnorid) ? winutils::findProcess(procname) : winutils::findProcess(pid);
 	if (proc == NULL) MessageBox(NULL, buf, L"Injection Failed", NULL);
 	DWORD opts = (inj_load_idx+1) | ((inj_exec_idx+1) << 16);
 
@@ -101,12 +79,20 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 			return 1;
 		}
 		break;
+	case NTCREATETHREADEX:
+		winutils::pNtCreateThreadEx NtCreateThreadEx = (pNtCreateThreadEx)GetProcAddress(GetModuleHandle("ntdll.dll"), "NtCreateThreadEx");
+		NtCreateThreadEx(&hthread, 0x1FFFFF, NULL, process, (LPTHREAD_START_ROUTINE) funcpointer, dllpath_address, FALSE, NULL, NULL, NULL, NULL);
+		if (hthread == nullptr) {
+			MessageBox(NULL, L"Failed to NtCreateThreadEx", L"Injection Failed", NULL);
+			return 1;
+		}
 	}
 
 	wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
 	OutputDebugString(buf);
 
-	
+	CloseHandle(hthread);
+    CloseHandle(process);
 	
 	//if()
 

@@ -42,7 +42,7 @@
     <ClCompile Include="WEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="winapi.cpp">
+    <ClCompile Include="winutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DLLInject.cpp">
@@ -86,7 +86,7 @@
     <ClInclude Include="DLLInject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="winapi.h">
+    <ClInclude Include="winutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

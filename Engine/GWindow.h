@@ -41,9 +41,9 @@ protected:
 
 	
 
-	static LRESULT WINAPI _WindowProcSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT winutils _WindowProcSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	static LRESULT WINAPI _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT winutils _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 

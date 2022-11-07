@@ -48,7 +48,7 @@ BOOL WProcessListView::Update(){
 
         exe = pe32.szExeFile;
         pid = std::to_wstring(pe32.th32ProcessID);
-        HWND remote_process_main_window = winapi::find_main_window(pe32.th32ProcessID);
+        HWND remote_process_main_window = winutils::find_main_window(pe32.th32ProcessID);
         HICON icon = (HICON)GetClassLong(remote_process_main_window, -14);
 
         //OutputDebugString((pid+L"\n").c_str());

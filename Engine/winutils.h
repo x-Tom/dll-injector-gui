@@ -5,9 +5,21 @@
 
 #define wcsbytes(x) (wcslen(x)+1)*2
 
-namespace winapi {
+namespace winutils {
 
-
+	typedef NTSTATUS (NTAPI *pNtCreateThreadEx) (
+		OUT PHANDLE hThread,
+		IN ACCESS_MASK DesiredAccess,
+		IN PVOID ObjectAttributes,
+		IN HANDLE ProcessHandle,
+		IN PVOID lpStartAddress,
+		IN PVOID lpParameter,
+		IN ULONG Flags,
+		IN SIZE_T StackZeroBits,
+		IN SIZE_T SizeOfStackCommit,
+		IN SIZE_T SizeOfStackReserve,
+		OUT PVOID lpBytesBuffer
+	);
 
 	enum PROCFIND {
 		CREATETOOLHELP32SNAPSHOT = 0

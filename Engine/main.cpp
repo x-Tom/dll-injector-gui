@@ -7,7 +7,7 @@
 #include "WText.h"
 #include "WProcessListView.h"
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+int winutils WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
     GWindow::INIT_COMMON_CONTROLS();
     GWindow::INIT_GDIPLUS();
