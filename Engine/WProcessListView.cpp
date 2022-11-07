@@ -33,24 +33,42 @@ BOOL WProcessListView::Update(){
     std::wstring exe;
     std::wstring pid;
     HICON icon;
-    WORD pic;
+    WORD pic = 0;
 
 	do {
 
         hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pe32.th32ProcessID);
+        if (hModuleSnap == nullptr) OutputDebugString(L"Module Snapshot Failed!");
         auto ok = Module32First(hModuleSnap, &me32);
         if(!ok) {
-            CloseHandle(hModuleSnap);
-            return FALSE;
+            /*CloseHandle(hModuleSnap);
+            return FALSE;*/
+            OutputDebugString(L"Module32First failed\n");
         }
 
         exe = pe32.szExeFile;
         pid = std::to_wstring(pe32.th32ProcessID);
-        icon = ExtractAssociatedIcon(hinst, me32.szExeFile, &pic);
+        HWND remote_process_main_window = winapi::find_main_window(pe32.th32ProcessID);
+        HICON icon = (HICON)GetClassLong(remote_process_main_window, -14);
+
+        //OutputDebugString((pid+L"\n").c_str());
+        //icon = ExtractIcon(hinst, pe32.szExeFile, 0);
+         //icon = ExtractIcon(hinst, pe32.szExeFile, 0);
+        if (icon == nullptr) {
+            icon = ExtractIcon(hinst, pe32.szExeFile, 0);
+        }
+        if (icon == nullptr) {
+            OutputDebugString(L"icon load failed\n");
+            icon = ExtractAssociatedIcon(hinst, me32.szExePath, &pic);
+            if(icon == nullptr) OutputDebugString(L"icon load failed\n");
+        }
 
         AddItem(exe, pid, icon);
 
     } while (Process32Next(hProcessSnap, &pe32));
+    
+    //ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
+
     return TRUE;
 }
 
@@ -85,7 +103,8 @@ BOOL WProcessListView::InitListViewColumns()
 
 BOOL WProcessListView::InitImageList(){
     if(image_list != nullptr) ImageList_Destroy(image_list);
-    image_list = ImageList_Create(GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), ILC_MASK, 1, 1); 
+    image_list = ImageList_Create(GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), ILC_MASK, MAX_PATH, MAX_PATH);
+    //image_list = ImageList_Create(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), ILC_MASK, MAX_PATH, MAX_PATH);
     ListView_SetImageList(hwnd, image_list, LVSIL_SMALL); // call again later
 
     return TRUE;
@@ -95,11 +114,11 @@ void WProcessListView::ClearItems(){
     for(auto& [exe,itm] : process_items){
         ListView_DeleteItem(hwnd, itm.index);
     }
+    index = 0;
 }
 
 BOOL WProcessListView::AddItem(std::wstring item, std::wstring subitem, HICON icon) 
 {  
-    int index = process_items.size();
     // HICON icon = nullptr;
     
     PROCITEM procitem {index, item, subitem, icon};
@@ -108,6 +127,7 @@ BOOL WProcessListView::AddItem(std::wstring item, std::wstring subitem, HICON ic
     if(!ok) return FALSE;
 
     LVITEM lvI;
+    LVITEM lvSubI;
 
     lvI.pszText   = &item[0];
     lvI.mask      = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE;
@@ -119,14 +139,23 @@ BOOL WProcessListView::AddItem(std::wstring item, std::wstring subitem, HICON ic
     // Insert items into the list.
     if (ListView_InsertItem(hwnd, &lvI) == -1) return FALSE;
     
-    lvI.pszText = &subitem[0];
-    lvI.iSubItem = 1;
+    lvSubI.pszText = &subitem[0];
+    lvSubI.iSubItem = 1;
+    lvSubI.mask = LVIF_TEXT;
+    lvSubI.stateMask = 0;
+    lvSubI.state = 0;
+    lvSubI.iItem = index;
+    lvSubI.iImage = index;
 
-    if (ListView_InsertItem(hwnd, &lvI) == -1) return FALSE;
+    if (ListView_SetItem(hwnd, &lvSubI) == -1) {
+        OutputDebugString(L"Subitem insert failed!\n");
+        //return FALSE;
+    }
 
     ImageList_AddIcon(image_list, icon);
+    index++;
 
-    ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
+    //ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
     return TRUE; 
 } 
 

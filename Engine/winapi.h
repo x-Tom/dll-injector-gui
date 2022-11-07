@@ -23,4 +23,14 @@ namespace winapi {
 
 	HANDLE _findProcess_ctlh32s(const wchar_t* processName, const DWORD pid);
 
+
+    struct handle_data {
+        unsigned long process_id;
+        HWND window_handle;
+    };
+
+    HWND find_main_window(DWORD process_id);
+    BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam);
+	BOOL is_main_window(HWND handle);
+
 }
