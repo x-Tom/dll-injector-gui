@@ -76,7 +76,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 std::wstring exe;
                 std::wstring pid;
                 for (auto& chld : children) {
-                    auto lvhwnd = static_cast<GChild*>(chld)->Handle();
+                    HWND lvhwnd = static_cast<GChild*>(chld)->Handle();
                     if(lvhwnd == lpnmitem->hwndFrom) {
                         for(auto& [key,val] : static_cast<WProcessListView*>(chld)->process_items){
                             if(val.index == lpnmitem->iItem) {
