@@ -5,13 +5,15 @@ WProcessListView::WProcessListView(HINSTANCE hInst, HMENU id, int x, int y, int 
 
 }
 
-bool WProcessListView::Update(){
+BOOL WProcessListView::Update(){
     
     ClearItems();
     
     HANDLE hProcessSnap;
+    HANDLE hModuleSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
+    MODULEENTRY32 me32;
 	DWORD dwPriorityClass;
 
     
@@ -31,17 +33,25 @@ bool WProcessListView::Update(){
     std::wstring exe;
     std::wstring pid;
     HICON icon;
+    WORD pic;
 
 	do {
 
+        hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pe32.th32ProcessID);
+        auto ok = Module32First(hModuleSnap, &me32);
+        if(!ok) {
+            CloseHandle(hModuleSnap);
+            return FALSE;
+        }
+
         exe = pe32.szExeFile;
         pid = std::to_wstring(pe32.th32ProcessID);
-        icon = ExtractIcon(hinst, pe32.szExeFile, 0);
+        icon = ExtractAssociatedIcon(hinst, me32.szExeFile, &pic);
 
         AddItem(exe, pid, icon);
 
     } while (Process32Next(hProcessSnap, &pe32));
-
+    return TRUE;
 }
 
 

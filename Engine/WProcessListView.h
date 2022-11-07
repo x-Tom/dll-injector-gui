@@ -14,7 +14,7 @@ public:
     WProcessListView(HINSTANCE, HMENU, int, int, int, int, std::vector<std::wstring>, LONG = 0);
     
 	virtual bool Create(HWND) override;
-	bool Update();
+	BOOL Update();
 
 	BOOL InitListViewColumns();
 	BOOL InitImageList();
