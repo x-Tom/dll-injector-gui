@@ -1,5 +1,6 @@
 #pragma once
 #include "GChild.h"
+#include "winapi.h"
 
 struct PROCITEM {
 	unsigned int index;
@@ -16,8 +17,9 @@ public:
 	bool Update();
 
 	BOOL InitListViewColumns();
+	BOOL InitImageList();
 	void ClearItems();
-	bool AddItem(std::wstring, std::wstring, HICON);
+	BOOL AddItem(std::wstring, std::wstring, HICON);
 	// bool Update();
 
 	WProcessListView() = default;

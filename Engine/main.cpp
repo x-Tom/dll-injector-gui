@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WComboBox ComboBoxINJ2(hInstance, COMBOBOX2, 25, 280, 180, 400, inj2, CBS_DROPDOWNLIST | CBS_HASSTRINGS);
 
     std::vector<std::wstring> columns = {L"Process",L"PID"};
-    WProcessListView ProcessList(hInstance, LISTVIEW1, width/2, 100, 300, 300, columns);
+    WProcessListView ProcessList(hInstance, LISTVIEW1, width/2.2, 100, 350, 350, columns);
 
     MainWindow.Add(&Button);
     MainWindow.Add(&ButtonF);

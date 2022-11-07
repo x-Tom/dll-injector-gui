@@ -62,8 +62,8 @@ BOOL WProcessListView::InitListViewColumns()
     for (iCol = 0; iCol < C_COLUMNS; iCol++)
     {
         lvc.iSubItem = iCol;
-        lvc.pszText = column_names[iCol].c_str();
-        lvc.cx = 100;               // Width of column in pixels.
+        lvc.pszText = &column_names[iCol][0];
+        (iCol) ? lvc.cx = 80 : lvc.cx = 250;               // Width of column in pixels.
 
         lvc.fmt = LVCFMT_LEFT;  // Left-aligned column.
         if (ListView_InsertColumn(hwnd, iCol, &lvc) == -1)
@@ -78,27 +78,28 @@ BOOL WProcessListView::InitImageList(){
     image_list = ImageList_Create(GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), ILC_MASK, 1, 1); 
     ListView_SetImageList(hwnd, image_list, LVSIL_SMALL); // call again later
 
-    return BOOL;
+    return TRUE;
 }
 
-void WProcessListView::ClearList(){
+void WProcessListView::ClearItems(){
     for(auto& [exe,itm] : process_items){
         ListView_DeleteItem(hwnd, itm.index);
     }
 }
 
-BOOL WProcessListView::AddItem(const std::wstring item, std::wstring subitem, HICON icon) 
+BOOL WProcessListView::AddItem(std::wstring item, std::wstring subitem, HICON icon) 
 {  
     int index = process_items.size();
     // HICON icon = nullptr;
     
     PROCITEM procitem {index, item, subitem, icon};
-    auto [itr, ok] = process_items.insert(std::pair<const std::wstring, PROCITEM>(item, process_items));
+    std::pair<std::wstring, PROCITEM> val = std::make_pair(item, procitem);
+    auto [itr, ok] = process_items.insert(val);
     if(!ok) return FALSE;
 
     LVITEM lvI;
 
-    lvI.pszText   = item.c_str();
+    lvI.pszText   = &item[0];
     lvI.mask      = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE;
     lvI.stateMask = 0;
     lvI.iSubItem  = 0;
@@ -108,7 +109,7 @@ BOOL WProcessListView::AddItem(const std::wstring item, std::wstring subitem, HI
     // Insert items into the list.
     if (ListView_InsertItem(hwnd, &lvI) == -1) return FALSE;
     
-    lvI.pszText = subitem.c_str();
+    lvI.pszText = &subitem[0];
     lvI.iSubItem = 1;
 
     if (ListView_InsertItem(hwnd, &lvI) == -1) return FALSE;
