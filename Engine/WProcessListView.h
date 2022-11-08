@@ -14,7 +14,7 @@ public:
     WProcessListView(HINSTANCE, HMENU, int, int, int, int, std::vector<std::wstring>, LONG = 0);
     
 	virtual bool Create(HWND) override;
-	BOOL Update();
+	virtual BOOL Update();
 
 	BOOL InitListViewColumns();
 	BOOL InitImageList();
@@ -29,9 +29,11 @@ public:
 
 	std::unordered_map<std::wstring, PROCITEM> process_items;
 protected:
+	bool autoupdate = false;
 	int index = 0;
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 	std::vector<std::wstring> column_names;
+	std::vector<int> column_widths = {250,80};
 	HIMAGELIST image_list;
 	LONG styles;
 };

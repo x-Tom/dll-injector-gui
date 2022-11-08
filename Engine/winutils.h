@@ -5,10 +5,13 @@
 #include <Psapi.h>
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #define wcsbytes(x) (wcslen(x)+1)*2
 
 namespace winutils {
+
+	
 
 	typedef NTSTATUS (NTAPI *pNtCreateThreadEx) (
 		OUT PHANDLE hThread,
@@ -35,6 +38,7 @@ namespace winutils {
 	HANDLE findProcess(const DWORD pid, LONG options = 0);
 
 	void* ProcFindFuncSwitch(LONG options);
+
 
 
 	HANDLE _findProcess_ctlh32s(const wchar_t* processName, const DWORD pid);

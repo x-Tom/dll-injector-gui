@@ -23,8 +23,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MainWindow.App(&injector);
 
     WButton Button(hInstance, BUTTONINJ, width-150, height-100, 100, 20, L"Inject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
-    WButton ButtonEject(hInstance, BUTTONEJ, width - 300, height - 100, 100, 20, L"Eject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
-    
+    // WButton ButtonEject(hInstance, BUTTONEJ, width - 300, height - 100, 100, 20, L"Eject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
+    WButton CheckboxAutoUpdate(hInstance, BUTTONCHECK, width - 300, height - 100, 100, 20, L"Auto-Refresh", BS_CHECKBOX | BS_FLAT);
+
     WButton GroupBoxSettings(hInstance, GROUPBOX1, 5, 100, 300, 250, L"Settings", BS_GROUPBOX);
     WButton Radio1(hInstance, RADIO1, 15, 125, 80, 20, L"Process:", BS_AUTORADIOBUTTON | BS_LEFTTEXT | WS_GROUP);
     WButton Radio2(hInstance, RADIO2, 15, 155, 80, 20, L"PID:", BS_AUTORADIOBUTTON | BS_LEFTTEXT);
@@ -42,11 +43,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WComboBox ComboBoxINJ1(hInstance, COMBOBOX1, 25, 250, 180, 400, inj1, CBS_DROPDOWNLIST | CBS_HASSTRINGS);
     WComboBox ComboBoxINJ2(hInstance, COMBOBOX2, 25, 280, 180, 400, inj2, CBS_DROPDOWNLIST | CBS_HASSTRINGS);
 
-    std::vector<std::wstring> columns = {L"Process",L"PID"};
-    WProcessListView ProcessList(hInstance, LISTVIEW1, width/2.2, 100, 350, 350, columns);
+    std::vector<std::wstring> columns1 = {L"Process",L"PID"};
+    WProcessListView ProcessList(hInstance, LISTVIEW1, width/2.2, 100, 350, 350, columns1);
+
+    std::vector<std::wstring> columns2 = {L"Module",L"Base Address"};
+    WProcessListView ModuleList(hInstance, LISTVIEW2, 15, 360, 200, 200, columns2);
+
 
     MainWindow.Add(&Button);
     //MainWindow.Add(&ButtonEject);
+    MainWindow.Add(&CheckboxAutoUpdate);
     MainWindow.Add(&ButtonF);
     MainWindow.Add(&Radio1);
     MainWindow.Add(&Radio2);
@@ -59,6 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MainWindow.Add(&ComboBoxINJ1);
     MainWindow.Add(&ComboBoxINJ2);
     MainWindow.Add(&ProcessList);
+    MainWindow.Add(&ModuleList);
 
     //std::wstring info = L"Width: " + std::to_wstring(width) + L"\nHeight: " + std::to_wstring(height);
     
@@ -70,20 +77,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MainWindow.Image(L"638x50final.png", (width-638)/2, 10, 638, 50);
            
     // no resizing WM_RESIZE listener
+    using namespace std::literals::chrono_literals;
+    auto wait = 10s;
 
-    std::jthread proclistupdate([&]() {
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(30000));
-            ProcessList.Update();
+    auto start = std::chrono::high_resolution_clock::now();
+    while (MainWindow.ProcessMessage()){
+        auto current = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> duration = current - start;
+        if(duration>wait){
+            if(ProcessList.autoupdate) ProcessList.Update();
+            if(ModuleList.autoupdate) ModuleList.Update();
         }
-    });
-
-    proclistupdate.detach();
-
-    // Decouple Update towinapi, have it take in iterators? Template function .emplace_back, vs .insert
-    // Add std::mutex to WProcessListView on the proc item map, lock guard or unique lock access to map in methods like update
-
-    while (MainWindow.ProcessMessage());
+        start = current;
+    }
 
 
     return 0;

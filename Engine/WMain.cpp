@@ -118,6 +118,12 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             case (int)BUTTONEJ:
                 //app->eject();
                 break;
+            case (int)BUTTONCHECK:
+                for (auto& chld : children) {
+                    if (static_cast<WProcessListView*>(chld)->GetID() == LISTVIEW1 || static_cast<WProcessListView*>(chld)->GetID() == LISTVIEW2) 
+                        chld->autoupdate = true;
+                }
+                break;
             case (int)RADIO1: //set injector to inject by process name
                 app->pnorid = true;
                 //loop through children if id is EDIT1 set active, if id EDIT2 set inactive

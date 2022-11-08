@@ -14,7 +14,6 @@ BOOL WProcessListView::Update(){
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
     MODULEENTRY32 me32;
-	DWORD dwPriorityClass;
 
     
 
@@ -91,7 +90,7 @@ BOOL WProcessListView::InitListViewColumns()
     {
         lvc.iSubItem = iCol;
         lvc.pszText = &column_names[iCol][0];
-        (iCol) ? lvc.cx = 80 : lvc.cx = 250;               // Width of column in pixels.
+        (iCol) ? lvc.cx = column_widths[1] : lvc.cx = column_widths[0];               // Width of column in pixels.
 
         lvc.fmt = LVCFMT_LEFT;  // Left-aligned column.
         if (ListView_InsertColumn(hwnd, iCol, &lvc) == -1)

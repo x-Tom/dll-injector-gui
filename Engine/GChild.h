@@ -14,7 +14,7 @@ public:
 	virtual bool Create(HWND) override;
 	GChild(const GChild&) = delete;
 	GChild& operator=(const GChild&) = delete;
-	HMENU GetID();
+	virtual HMENU GetID();
 
 protected:
 	HWND parent;
