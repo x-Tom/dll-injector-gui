@@ -80,7 +80,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		}
 		break;
 	case NTCREATETHREADEX:
-		winutils::pNtCreateThreadEx NtCreateThreadEx = (pNtCreateThreadEx)GetProcAddress(GetModuleHandle("ntdll.dll"), "NtCreateThreadEx");
+		winutils::pNtCreateThreadEx NtCreateThreadEx = (winutils::pNtCreateThreadEx)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtCreateThreadEx");
 		NtCreateThreadEx(&hthread, 0x1FFFFF, NULL, process, (LPTHREAD_START_ROUTINE) funcpointer, dllpath_address, FALSE, NULL, NULL, NULL, NULL);
 		if (hthread == nullptr) {
 			MessageBox(NULL, L"Failed to NtCreateThreadEx", L"Injection Failed", NULL);
@@ -88,8 +88,8 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		}
 	}
 
-	wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
-	OutputDebugString(buf);
+	/*wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
+	OutputDebugString(buf);*/
 
 	CloseHandle(hthread);
     CloseHandle(process);

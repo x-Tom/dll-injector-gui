@@ -34,7 +34,7 @@ bool WMain::Create(HWND)
         0, wndClassName,
         title.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
         x, y, w, h,
-        nullptr, nullptr, hinst, this // pass in this to winutils so it can get access to member function from static function
+        nullptr, nullptr, hinst, this // pass in this to winapi so it can get access to member function from static function
     );
 
     if (hwnd == nullptr) {
@@ -70,14 +70,14 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         break;
     case WM_NOTIFY:
-        switch((LPNMHDR)lParam->code){
+        switch (((LPNMHDR)lParam)->code) {
             case NM_CLICK:
                 auto lpnmitem = (LPNMITEMACTIVATE) lParam;
                 std::wstring exe;
                 std::wstring pid;
                 for (auto& chld : children) {
                     HWND lvhwnd = static_cast<GChild*>(chld)->Handle();
-                    if(lvhwnd == lpnmitem->hwndFrom) {
+                    if(lvhwnd == ((LPNMHDR)lParam)->hwndFrom) {
                         for(auto& [key,val] : static_cast<WProcessListView*>(chld)->process_items){
                             if(val.index == lpnmitem->iItem) {
                                 exe = key;
