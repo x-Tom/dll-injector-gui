@@ -115,6 +115,8 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 break;
             case (int)BUTTONINJ:
                 app->inject();
+            case (int)BUTTONEJ:
+                //app->eject();
                 break;
             case (int)RADIO1: //set injector to inject by process name
                 app->pnorid = true;

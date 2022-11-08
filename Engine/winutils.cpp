@@ -22,7 +22,28 @@ HANDLE winutils::findProcess(const wchar_t* processName, LONG options) {
 	return ((HANDLE(*)(const wchar_t*, DWORD))function)(processName, NULL);
 }
 
+HMODULE winutils::remoteModuleHandle(HANDLE process_handle, LPWSTR module_name) {
+	DWORD bytesreq = 0;
+	HMODULE module_array[1024] = { 0 };
+	if (!EnumProcessModules(process_handle, module_array, sizeof(module_array), &bytesreq)) {
+		DWORD err = GetLastError();
+		OutputDebugString(std::to_wstring(err).c_str());
+		return nullptr;
+	}
 
+	wchar_t mname_buffer[MAX_PATH] = {0};
+
+	for (auto& hm : module_array) {
+		if (!GetModuleBaseName(process_handle, hm, mname_buffer, sizeof(mname_buffer))) {
+			DWORD err = GetLastError();
+			OutputDebugString(std::to_wstring(err).c_str());
+			return nullptr;
+		}
+		if (!wcscmp(mname_buffer, module_name)) return hm;
+	}
+
+	return nullptr;
+}
 
 
 

@@ -36,6 +36,7 @@ public:
 	//int INJExecGet();
 
 	DWORD inject();
+	DWORD eject();
 
 	bool pnorid; // true for proc name false for proc id;
 	int inj_load_idx;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include "WinHeader.h"
 #include "WMain.h"
 #include "WButton.h"
@@ -22,6 +23,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MainWindow.App(&injector);
 
     WButton Button(hInstance, BUTTONINJ, width-150, height-100, 100, 20, L"Inject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
+    WButton ButtonEject(hInstance, BUTTONEJ, width - 300, height - 100, 100, 20, L"Eject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
+    
     WButton GroupBoxSettings(hInstance, GROUPBOX1, 5, 100, 300, 250, L"Settings", BS_GROUPBOX);
     WButton Radio1(hInstance, RADIO1, 15, 125, 80, 20, L"Process:", BS_AUTORADIOBUTTON | BS_LEFTTEXT | WS_GROUP);
     WButton Radio2(hInstance, RADIO2, 15, 155, 80, 20, L"PID:", BS_AUTORADIOBUTTON | BS_LEFTTEXT);
@@ -43,6 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WProcessListView ProcessList(hInstance, LISTVIEW1, width/2.2, 100, 350, 350, columns);
 
     MainWindow.Add(&Button);
+    //MainWindow.Add(&ButtonEject);
     MainWindow.Add(&ButtonF);
     MainWindow.Add(&Radio1);
     MainWindow.Add(&Radio2);
@@ -56,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MainWindow.Add(&ComboBoxINJ2);
     MainWindow.Add(&ProcessList);
 
-    std::wstring info = L"Width: " + std::to_wstring(width) + L"\nHeight: " + std::to_wstring(height);
+    //std::wstring info = L"Width: " + std::to_wstring(width) + L"\nHeight: " + std::to_wstring(height);
     
     
 
@@ -67,9 +71,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
            
     // no resizing WM_RESIZE listener
 
-    
+    std::jthread proclistupdate([&]() {
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(30000));
+            ProcessList.Update();
+        }
+    });
+
+    proclistupdate.detach();
+
+    // Decouple Update towinapi, have it take in iterators? Template function .emplace_back, vs .insert
+    // Add std::mutex to WProcessListView on the proc item map, lock guard or unique lock access to map in methods like update
 
     while (MainWindow.ProcessMessage());
+
 
     return 0;
 };

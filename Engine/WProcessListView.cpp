@@ -67,7 +67,7 @@ BOOL WProcessListView::Update(){
 
     } while (Process32Next(hProcessSnap, &pe32));
     
-    //ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
+    ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
 
     return TRUE;
 }
@@ -111,9 +111,8 @@ BOOL WProcessListView::InitImageList(){
 }
 
 void WProcessListView::ClearItems(){
-    for(auto& [exe,itm] : process_items){
-        ListView_DeleteItem(hwnd, itm.index);
-    }
+    ListView_DeleteAllItems(hwnd);
+    process_items.clear();
     index = 0;
 }
 

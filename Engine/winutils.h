@@ -2,6 +2,9 @@
 
 #include "WinHeader.h"
 #include <tlhelp32.h>
+#include <Psapi.h>
+#include <iostream>
+#include <string>
 
 #define wcsbytes(x) (wcslen(x)+1)*2
 
@@ -28,6 +31,7 @@ namespace winutils {
 	//HANDLE ForEachProcess()
 
 	HANDLE findProcess(const wchar_t* processName, LONG options = 0);
+	HMODULE remoteModuleHandle(HANDLE, LPWSTR);
 	HANDLE findProcess(const DWORD pid, LONG options = 0);
 
 	void* ProcFindFuncSwitch(LONG options);

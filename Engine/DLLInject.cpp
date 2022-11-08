@@ -37,10 +37,45 @@ DWORD dllinject::inject(){
 
 	DWORD pid = _wtoi(procid);
 	HANDLE proc = (pnorid) ? winutils::findProcess(procname) : winutils::findProcess(pid);
-	if (proc == NULL) MessageBox(NULL, buf, L"Injection Failed", NULL);
+	if (proc == NULL) MessageBox(NULL, buf, L"Process not found, Injection Failed!", NULL);
 	DWORD opts = (inj_load_idx+1) | ((inj_exec_idx+1) << 16);
 
 	return dllinject::_injectfpath(opfn.lpstrFile, proc, opts);
+}
+
+DWORD dllinject::eject()
+{
+	DWORD pid = _wtoi(procid);
+	HANDLE proc = (pnorid) ? winutils::findProcess(procname) : winutils::findProcess(pid);
+	HMODULE remote_module = winutils::remoteModuleHandle(proc, opfn.lpstrFileTitle);
+	if (proc == nullptr || remote_module == nullptr) return 1;
+	// Call free library in the remote process;
+	LPVOID pFreeLibraryW = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "FreeLibraryW");
+	HANDLE hthread;
+	DWORD dword;
+
+	switch (inj_exec_idx) {
+	case CREATEREMOTETHREADEX:
+
+		hthread = CreateRemoteThread(proc, NULL, NULL, (LPTHREAD_START_ROUTINE)pFreeLibraryW, remote_module, 0, &dword);
+		if (hthread == nullptr) {
+			MessageBox(NULL, L"Failed to Create Remote Thread", L"Injection Failed", NULL);
+			return 1;
+		}
+		break;
+	case NTCREATETHREADEX:
+		winutils::pNtCreateThreadEx NtCreateThreadEx = (winutils::pNtCreateThreadEx)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtCreateThreadEx");
+		NtCreateThreadEx(&hthread, 0x1FFFFF, NULL, proc, (LPTHREAD_START_ROUTINE)pFreeLibraryW, remote_module, FALSE, NULL, NULL, NULL, NULL);
+		if (hthread == nullptr) {
+			MessageBox(NULL, L"Failed to NtCreateThreadEx", L"Injection Failed", NULL);
+			return 1;
+		}
+		break;
+	}
+
+	//CloseHandle(remote_module);
+	//CloseHandle(proc);
+	return 0;
 }
 
 DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
@@ -86,6 +121,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 			MessageBox(NULL, L"Failed to NtCreateThreadEx", L"Injection Failed", NULL);
 			return 1;
 		}
+		break;
 	}
 
 	/*wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
