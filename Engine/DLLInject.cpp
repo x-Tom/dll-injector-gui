@@ -124,7 +124,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		break;
 	}
 
-	/*wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
+	/*wsOutputDebugString(buf, L"Remote Thread Handle: %x\n", hthread);
 	OutputDebugString(buf);*/
 
 	CloseHandle(hthread);
@@ -142,11 +142,11 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 // DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 // 	void* dllpath_address = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
 // 	wchar_t buf[MAX_PATH] = { 0 };
-// 	wsprintf(buf, L"DLL file path: %s\n", dllpath, process);
+// 	wsOutputDebugString(buf, L"DLL file path: %s\n", dllpath, process);
 // 	OutputDebugString(buf);
-// 	wsprintf(buf, L"Remote Process Handle: %x\n", process);
+// 	wsOutputDebugString(buf, L"Remote Process Handle: %x\n", process);
 // 	OutputDebugString(buf);
-// 	wsprintf(buf, L"DLL file path string parameter address in target process: %x\n", dllpath_address);
+// 	wsOutputDebugString(buf, L"DLL file path string parameter address in target process: %x\n", dllpath_address);
 // 	OutputDebugString(buf);
 // 	if (dllpath_address == nullptr) {
 // 		MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
@@ -172,7 +172,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 // 		break;
 // 	}
 
-// 	wsprintf(buf, L"LoadLibraryW Function Pointer: %x\n", funcpointer);
+// 	wsOutputDebugString(buf, L"LoadLibraryW Function Pointer: %x\n", funcpointer);
 // 	OutputDebugString(buf);
 
 // 	switch (options & (0xffff << 16)) {
@@ -186,7 +186,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 // 		break;
 // 	}
 
-// 	wsprintf(buf, L"Remote Thread Handle: %x\n", hthread);
+// 	wsOutputDebugString(buf, L"Remote Thread Handle: %x\n", hthread);
 // 	OutputDebugString(buf);
 
 	

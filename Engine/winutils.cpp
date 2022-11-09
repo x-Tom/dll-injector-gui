@@ -143,31 +143,31 @@ namespace winutils {
         HMODULE hNtDll;
 
         if (!(hNtDll = LoadLibrary(L"ntdll.dll"))) {
-            printf("Cannot load ntdll.dll.\n");
+            OutputDebugString(L"Cannot load ntdll.dll.\n");
             return NULL;
         }
 
         if (!(gNtQueryInformationProcess = (pfnNtQueryInformationProcess)GetProcAddress(hNtDll, "NtQueryInformationProcess"))) {
-            printf("Cannot load NtQueryInformationProcess.\n");
+            OutputDebugString(L"Cannot load NtQueryInformationProcess.\n");
             return NULL;
         }
 
         // Allocate the memory for the requested structure
         if ((pProcessInformation = (PPROCESS_BASIC_INFORMATION)malloc(ProcessInformationLength)) == NULL) {
-            printf("ExAllocatePoolWithTag failed.\n");
+            OutputDebugString(L"ExAllocatePoolWithTag failed.\n");
             return NULL;
         }
 
         // Fill the requested structure
         if (!NT_SUCCESS(Status = gNtQueryInformationProcess(Process, ProcessInformationClass, pProcessInformation, ProcessInformationLength, &ReturnLength))) {
-            printf("NtQueryInformationProcess should return NT_SUCCESS (Status = %#x).\n", Status);
+            OutputDebugString(L"NtQueryInformationProcess should return NT_SUCCESS (Status = %#x).\n");
             free(pProcessInformation);
             return NULL;
         }
 
         // Check the requested structure size with the one returned by NtQueryInformationProcess
         if (ReturnLength != ProcessInformationLength) {
-            printf("Warning : NtQueryInformationProcess ReturnLength is different than ProcessInformationLength\n");
+            OutputDebugString(L"Warning : NtQueryInformationProcess ReturnLength is different than ProcessInformationLength\n");
             return NULL;
         }
 
@@ -182,13 +182,13 @@ namespace winutils {
 
         // ProcessBasicInformation returns information about the PebBaseAddress
         if ((pProcessInformation = (PPROCESS_BASIC_INFORMATION)QueryProcessInformation(Process, ProcessBasicInformation, ProcessInformationLength)) == NULL) {
-            printf("Handle=%x : QueryProcessInformation failed.\n", Process);
+            OutputDebugString(L"Handle=%x : QueryProcessInformation failed.\n");
             return NULL;
         }
 
         // Check the correctness of the value returned
         if (pProcessInformation->PebBaseAddress == NULL) {
-            printf("Handle=%x : PEB address cannot be found.\n", Process);
+            OutputDebugString(L"Handle=%x : PEB address cannot be found.\n");
             free(pProcessInformation);
             return NULL;
         }
@@ -225,13 +225,13 @@ namespace winutils {
 
         // Allocate a MODULE_INFORMATION_TABLE
         if ((pModuleInformationTable = (PMODULE_INFORMATION_TABLE)malloc(sizeof(MODULE_INFORMATION_TABLE))) == NULL) {
-            printf("Cannot allocate a MODULE_INFORMATION_TABLE.\n");
+            OutputDebugString(L"Cannot allocate a MODULE_INFORMATION_TABLE.\n");
             return NULL;
         }
 
         // Allocate the correct amount of memory depending of the modules count
         if ((pModuleInformationTable->Modules = (PMODULE_ENTRY)malloc(Count * sizeof(MODULE_ENTRY))) == NULL) {
-            printf("Cannot allocate a MODULE_INFORMATION_TABLE.\n");
+            OutputDebugString(L"Cannot allocate a MODULE_INFORMATION_TABLE.\n");
             return NULL;
         }
 
@@ -268,13 +268,13 @@ namespace winutils {
 
         // Read the PEB from th process
         if ((pPeb = GetPebProcess(Process)) == NULL) {
-            printf("GetPebCurrentProcess failed.\n");
+            OutputDebugString(L"GetPebCurrentProcess failed.\n");
             return NULL;
         }
 
         // Convert the PEB into a MODULE_INFORMATION_TABLE
         if ((pModuleInformationTable = CreateModuleInformation(pPeb)) == NULL) {
-            printf("CreateModuleInformation failed.");
+            OutputDebugString(L"CreateModuleInformation failed.");
             return NULL;
         }
 

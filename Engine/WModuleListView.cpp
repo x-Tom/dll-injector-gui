@@ -114,65 +114,39 @@
 //}
 
 BOOL WModuleListView::Update() {
+    using namespace winutils;
 
     ClearItems();
 
     std::wstring mod;
     std::wstring baseaddr;
-    HICON icon;
+    HICON icon = nullptr;
+    WORD pic = 0;
 
-    WORD pic;
-    DWORD bytesreq = 0;
-    HMODULE module_array[1024] = { 0 };
-    if (!EnumProcessModules(process, module_array, sizeof(module_array), &bytesreq)) {
-        DWORD err = GetLastError();
-        OutputDebugString(std::to_wstring(err).c_str());
-        errmsg("EnumProcessModules Failed!");
+    MODULE_INFORMATION_TABLE* moduleTable = QueryModuleInformationProcess(process);
+    if (moduleTable == nullptr) {
+        errmsg("QueryModuleProcessInformationFailed");
         return FALSE;
     }
 
-    wchar_t mname_buffer[MAX_PATH] = { 0 };
-    wchar_t mpath_buffer[MAX_PATH] = { 0 };
-    MODULEINFO mi;
+    //size_t moduleIndex;
+    for (size_t moduleIndex = 0; moduleIndex < moduleTable->ModuleCount; moduleIndex++)
+    {
+        MODULE_ENTRY* moduleEntry = &moduleTable->Modules[moduleIndex];
+        mod = moduleEntry->BaseName.Buffer;
+        baseaddr = std::to_wstring((uintptr_t)moduleEntry->BaseAddress);
 
-
-    for (auto& hm : module_array) {
-        if (!GetModuleBaseName(process, hm, mname_buffer, sizeof(mname_buffer))) {
-            DWORD err = GetLastError();
-            OutputDebugString(std::to_wstring(err).c_str());
-            MessageBoxW(NULL, L"GetModuleBaseName failed", NULL, NULL);
-            return FALSE;
-        }
-        if (!GetModuleInformation(process, hm, &mi, sizeof(mi))) {
-            DWORD err = GetLastError();
-            OutputDebugString(std::to_wstring(err).c_str());
-            MessageBoxW(NULL, L"GetModuleInformation failed", NULL, NULL);
-
-            return FALSE;
-        }
-
-        if (!GetModuleFileNameEx(process, hm, mpath_buffer, sizeof(mpath_buffer))) {
-            DWORD err = GetLastError();
-            OutputDebugString(std::to_wstring(err).c_str());
-            MessageBoxW(NULL, L"GetModuleFileNameEx failed", NULL, NULL);
-
-            return FALSE;
-        }
-
-
-        icon = ExtractIcon(hinst, mpath_buffer, 0);
+        icon = ExtractIcon(hinst, moduleEntry->BaseName.Buffer, 0);
         if (icon == nullptr) {
             OutputDebugString(L"icon load failed\n");
-            icon = ExtractAssociatedIcon(hinst, mpath_buffer, &pic);
-            if (icon == nullptr) OutputDebugString(L"icon load failed\n");
+            icon = ExtractAssociatedIcon(hinst, moduleEntry->FullName.Buffer, &pic);
+            if(icon == nullptr) OutputDebugString(L"icon load failed\n");
         }
 
-
-        mod = mname_buffer;
-        baseaddr = std::to_wstring((uintptr_t)mi.lpBaseOfDll);
 
         AddItem(mod, baseaddr, icon);
     }
+
 
     ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
 

@@ -96,7 +96,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                                     if (id == LISTVIEW2) {
                                         auto mlv = static_cast<WModuleListView*>(child);
                                         //MessageBox(NULL, pid.c_str(), NULL, NULL);
-                                        mlv->process = OpenProcess(NULL, FALSE, std::stoi(pid));
+                                        mlv->process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, std::stoi(pid));
                                         mlv->Update();
                                     }
                                 }
