@@ -7,6 +7,7 @@
 #include "WEdit.h"
 #include "WText.h"
 #include "WProcessListView.h"
+#include "WModuleListView.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
@@ -24,7 +25,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     WButton Button(hInstance, BUTTONINJ, width-150, height-100, 100, 20, L"Inject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
     // WButton ButtonEject(hInstance, BUTTONEJ, width - 300, height - 100, 100, 20, L"Eject", BS_PUSHBUTTON | BS_FLAT | WS_BORDER);
-    WButton CheckboxAutoUpdate(hInstance, BUTTONCHECK, width - 300, height - 100, 100, 20, L"Auto-Refresh", BS_CHECKBOX | BS_FLAT);
+    WButton CheckboxAutoUpdate(hInstance, BUTTONCHECK, width - 300, height - 100, 120, 20, L"Auto-Refresh", BS_AUTOCHECKBOX | BS_FLAT);
 
     WButton GroupBoxSettings(hInstance, GROUPBOX1, 5, 100, 300, 250, L"Settings", BS_GROUPBOX);
     WButton Radio1(hInstance, RADIO1, 15, 125, 80, 20, L"Process:", BS_AUTORADIOBUTTON | BS_LEFTTEXT | WS_GROUP);
@@ -47,7 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WProcessListView ProcessList(hInstance, LISTVIEW1, width/2.2, 100, 350, 350, columns1);
 
     std::vector<std::wstring> columns2 = {L"Module",L"Base Address"};
-    WProcessListView ModuleList(hInstance, LISTVIEW2, 15, 360, 200, 200, columns2);
+    WModuleListView ModuleList(hInstance, LISTVIEW2, 15, 360, 300, 150, columns2);
 
 
     MainWindow.Add(&Button);

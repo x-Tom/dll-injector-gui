@@ -5,9 +5,8 @@
 class WModuleListView : public WProcessListView {
 public:
 	using WProcessListView::WProcessListView;
-	using module_items = process_items;
 	virtual BOOL Update() override;
-	std::vector<int> column_widths = {100,100};
+	std::vector<int> column_widths = {200,100};
 	HANDLE process = nullptr;
 };
 

@@ -1,7 +1,8 @@
 #include "WMain.h"
 #include "WText.h"
 #include "WButton.h"
-#include "WProcessListView.h"
+//#include "WProcessListView.h"
+#include "WModuleListView.h"
 
 
 WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
@@ -76,25 +77,34 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 std::wstring exe;
                 std::wstring pid;
                 for (auto& chld : children) {
-                    HWND lvhwnd = static_cast<GChild*>(chld)->Handle();
-                    if(lvhwnd == ((LPNMHDR)lParam)->hwndFrom) {
-                        for(auto& [key,val] : static_cast<WProcessListView*>(chld)->process_items){
+                    /*HWND lvhwnd = static_cast<GChild*>(chld)->Handle();*/
+                    HMENU id = static_cast<GChild*>(chld)->GetID();
+                    if(id == LISTVIEW1) {
+                        auto lv = static_cast<WProcessListView*>(chld);
+                        for(auto& [key,val] : lv->process_items){
                             if(val.index == lpnmitem->iItem) {
                                 exe = key;
                                 pid = val.subitem_name;
+                                for (auto& child : children) {
+                                    HMENU id = static_cast<GChild*>(child)->GetID();
+                                    if (id == EDIT1) {
+                                        SetWindowText(static_cast<GChild*>(child)->Handle(), exe.c_str());
+                                    }
+                                    if (id == EDIT2) {
+                                        SetWindowText(static_cast<GChild*>(child)->Handle(), pid.c_str());
+                                    }
+                                    if (id == LISTVIEW2) {
+                                        auto mlv = static_cast<WModuleListView*>(child);
+                                        //MessageBox(NULL, pid.c_str(), NULL, NULL);
+                                        mlv->process = OpenProcess(NULL, FALSE, std::stoi(pid));
+                                        mlv->Update();
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                for (auto& chld : children) {
-                    HMENU id = static_cast<GChild*>(chld)->GetID();
-                    if (id == EDIT1) {
-                        SetWindowText(static_cast<GChild*>(chld)->Handle(), exe.c_str());
-                    }
-                    if (id == EDIT2) {
-                        SetWindowText(static_cast<GChild*>(chld)->Handle(), pid.c_str());
-                    }
-                }
+                
             break;
         }
         break;
@@ -121,7 +131,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             case (int)BUTTONCHECK:
                 for (auto& chld : children) {
                     if (static_cast<WProcessListView*>(chld)->GetID() == LISTVIEW1 || static_cast<WProcessListView*>(chld)->GetID() == LISTVIEW2) 
-                        chld->autoupdate = true;
+                        static_cast<WProcessListView*>(chld)->autoupdate = !static_cast<WProcessListView*>(chld)->autoupdate;
                 }
                 break;
             case (int)RADIO1: //set injector to inject by process name

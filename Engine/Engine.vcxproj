@@ -158,6 +158,7 @@
     <ClCompile Include="WComboBox.cpp" />
     <ClCompile Include="WEdit.cpp" />
     <ClCompile Include="winutils.cpp" />
+    <ClCompile Include="WModuleListView.cpp" />
     <ClCompile Include="WProcessListView.cpp" />
     <ClCompile Include="WMain.cpp" />
     <ClCompile Include="GStatic.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="WEdit.h" />
     <ClInclude Include="winutils.h" />
     <ClInclude Include="WinHeader.h" />
+    <ClInclude Include="WModuleListView.h" />
     <ClInclude Include="WProcessListView.h" />
     <ClInclude Include="WMain.h" />
     <ClInclude Include="GStatic.h" />

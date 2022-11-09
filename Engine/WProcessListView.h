@@ -16,7 +16,7 @@ public:
 	virtual bool Create(HWND) override;
 	virtual BOOL Update();
 
-	BOOL InitListViewColumns();
+	virtual BOOL InitListViewColumns();
 	BOOL InitImageList();
 	void ClearItems();
 	BOOL AddItem(std::wstring, std::wstring, HICON);
@@ -28,8 +28,9 @@ public:
 	WProcessListView& operator=(const WProcessListView&) = delete;
 
 	std::unordered_map<std::wstring, PROCITEM> process_items;
-protected:
 	bool autoupdate = false;
+protected:
+	
 	int index = 0;
 	virtual LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 	std::vector<std::wstring> column_names;
