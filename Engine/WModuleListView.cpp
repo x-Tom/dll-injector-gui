@@ -119,6 +119,7 @@ BOOL WModuleListView::Update() {
     ClearItems();
 
     std::wstring mod;
+    std::wstring fullmod;
     std::wstring baseaddr;
     HICON icon = nullptr;
     WORD pic = 0;
@@ -133,16 +134,20 @@ BOOL WModuleListView::Update() {
     for (size_t moduleIndex = 0; moduleIndex < moduleTable->ModuleCount; moduleIndex++)
     {
         MODULE_ENTRY* moduleEntry = &moduleTable->Modules[moduleIndex];
-        mod = moduleEntry->BaseName.Buffer;
+        mod = std::move(moduleEntry->BaseName.Buffer);
+        fullmod = std::move(moduleEntry->FullName.Buffer);
         baseaddr = std::to_wstring((uintptr_t)moduleEntry->BaseAddress);
 
-        icon = ExtractIcon(hinst, moduleEntry->BaseName.Buffer, 0);
+        icon = ExtractIcon(hinst, mod.c_str(), 0);
         if (icon == nullptr) {
             OutputDebugString(L"icon load failed\n");
-            icon = ExtractAssociatedIcon(hinst, moduleEntry->FullName.Buffer, &pic);
+            /*icon = ExtractAssociatedIcon(hinst, moduleEntry->FullName.Buffer, &pic);*/
+            icon = ExtractAssociatedIcon(hinst, (LPWSTR)fullmod.c_str(), &pic);
             if(icon == nullptr) OutputDebugString(L"icon load failed\n");
         }
 
+        //free(moduleEntry->BaseName.Buffer);
+        //free(moduleEntry->FullName.Buffer);
 
         AddItem(mod, baseaddr, icon);
     }
