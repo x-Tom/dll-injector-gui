@@ -17,7 +17,7 @@ public:
 	virtual BOOL Update();
 
 	virtual BOOL InitListViewColumns();
-	BOOL InitImageList();
+	virtual BOOL InitImageList();
 	void ClearItems();
 	BOOL AddItem(std::wstring, std::wstring, HICON);
 	// bool Update();
