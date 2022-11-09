@@ -239,6 +239,21 @@ namespace winutils {
     }
 
 
+    BOOL CopyProcessMemory(HANDLE process, void* destination, void* source, size_t size){
+        DWORD br;
+        BYTE* buffer = (BYTE*)malloc(size);
+        if(!ReadProcessMemory(process, source, buffer, sizeof(buffer), &br)){
+            DWORD err = GetLastError();
+            errmsg("RPM Failed");
+            return FALSE;
+        }
+        if(!WriteProcessMemory(process, buffer, destination, sizeof(buffer), &br)){
+            errmsg("WPM Failed");
+            return FALSE;
+        }
+        free(buffer);
+    }
+
     PMODULE_INFORMATION_TABLE CreateModuleInformation(IN PPEB pPeb, IN HANDLE process) {
 
         ULONG Count = 0;
@@ -249,16 +264,18 @@ namespace winutils {
         PMODULE_ENTRY CurModule = NULL;
         PLDR_DATA_TABLE_ENTRY pLdrEntry = NULL;
         PMODULE_INFORMATION_TABLE pModuleInformationTable = NULL;
-
+        BOOL ret;
         //Every pointer dereference requires instead a ReadProcessMemory as PEB is in remote process
         size_t br;
         PEB pebcopy = {0};
-        ReadProcessMemory(process, pPeb, &pebcopy, sizeof(PEB), &br);
+        ret = ReadProcessMemory(process, pPeb, &pebcopy, sizeof(PEB), &br);
+        if(!ret) errmsg("RPM Failed");
         //pLdrData = pPeb->Ldr;
         pLdrData = pebcopy.Ldr;
 
         PEB_LDR_DATA ldr_data = {0};
-        ReadProcessMemory(process, pLdrData, &ldr_data, sizeof(PEB_LDR_DATA), &br);
+        ret = ReadProcessMemory(process, pLdrData, &ldr_data, sizeof(PEB_LDR_DATA), &br);
+        if(!ret) errmsg("RPM Failed");
         //pHeadEntry = &pPeb->Ldr->InMemoryOrderModuleList;
         //pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData + (uintptr_t)32);
         //(ULONG_PTR)(&((type *)0)->field)
@@ -269,7 +286,8 @@ namespace winutils {
         pEntry = entry.Flink;
         while (pEntry != pHeadEntry) { // Infinite LOOP
             Count++;
-            ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
+            ret = ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
+            if(!ret) errmsg("RPM Failed");
             pEntry = entry.Flink;
         }
 
@@ -302,15 +320,27 @@ namespace winutils {
 
             // MAY NEED TO BE REPLACED WITH RPM
             // Fill the MODULE_ENTRY with the LDR_DATA_TABLE_ENTRY information
-            RtlCopyMemory(&CurModule->BaseName, &pLdrEntry->BaseDllName, sizeof(CurModule->BaseName));
-            RtlCopyMemory(&CurModule->FullName, &pLdrEntry->FullDllName, sizeof(CurModule->FullName));
-            RtlCopyMemory(&CurModule->SizeOfImage, &pLdrEntry->SizeOfImage, sizeof(CurModule->SizeOfImage));
-            RtlCopyMemory(&CurModule->BaseAddress, &pLdrEntry->DllBase, sizeof(CurModule->BaseAddress));
-            RtlCopyMemory(&CurModule->EntryPoint, &pLdrEntry->EntryPoint, sizeof(CurModule->EntryPoint));
+            // RtlCopyMemory(&CurModule->BaseName, &pLdrEntry->BaseDllName, sizeof(CurModule->BaseName));
+            // RtlCopyMemory(&CurModule->FullName, &pLdrEntry->FullDllName, sizeof(CurModule->FullName));
+            // RtlCopyMemory(&CurModule->SizeOfImage, &pLdrEntry->SizeOfImage, sizeof(CurModule->SizeOfImage));
+            // RtlCopyMemory(&CurModule->BaseAddress, &pLdrEntry->DllBase, sizeof(CurModule->BaseAddress));
+            // RtlCopyMemory(&CurModule->EntryPoint, &pLdrEntry->EntryPoint, sizeof(CurModule->EntryPoint));
+            ret = CopyProcessMemory(process, &CurModule->BaseName, &pLdrEntry->BaseDllName, sizeof(CurModule->BaseName));
+            if(!ret) return nullptr;
+            ret = CopyProcessMemory(process, &CurModule->FullName, &pLdrEntry->FullDllName, sizeof(CurModule->FullName));
+            if(!ret) return nullptr;
+            ret = CopyProcessMemory(process, &CurModule->SizeOfImage, &pLdrEntry->SizeOfImage, sizeof(CurModule->SizeOfImage));
+            if(!ret) return nullptr;
+            ret = CopyProcessMemory(process, &CurModule->BaseAddress, &pLdrEntry->DllBase, sizeof(CurModule->BaseAddress));
+            if(!ret) return nullptr;
+            ret = CopyProcessMemory(process, &CurModule->EntryPoint, &pLdrEntry->EntryPoint, sizeof(CurModule->EntryPoint));
+            if(!ret) return nullptr;
+
 
             // Iterate to the next entry
             //pEntry = pEntry->Flink;
-            ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
+            ret = ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
+            if(!ret) errmsg("RPM Failed");
             pEntry = entry.Flink;
         }
 
