@@ -9,7 +9,7 @@ public:
 	virtual BOOL InitImageList() override;
 	virtual BOOL Create(HWND) override; 
 	virtual BOOL Update() override;
-	std::vector<int> column_widths = {200,100};
+	std::vector<int> column_widths = {180,100};
 	HANDLE process = nullptr;
 };
 
