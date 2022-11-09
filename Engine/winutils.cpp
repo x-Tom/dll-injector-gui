@@ -250,6 +250,7 @@ namespace winutils {
         PLDR_DATA_TABLE_ENTRY pLdrEntry = NULL;
         PMODULE_INFORMATION_TABLE pModuleInformationTable = NULL;
 
+        //READPROCESS MEMORY INSTEAD
         pLdrData = pPeb->Ldr;
         pHeadEntry = &pLdrData->InMemoryOrderModuleList;
 
