@@ -240,18 +240,19 @@ namespace winutils {
 
 
     BOOL CopyProcessMemory(HANDLE process, void* destination, void* source, size_t size){
-        DWORD br;
+        size_t br;
         BYTE* buffer = (BYTE*)malloc(size);
         if(!ReadProcessMemory(process, source, buffer, sizeof(buffer), &br)){
             DWORD err = GetLastError();
             errmsg("RPM Failed");
             return FALSE;
         }
-        if(!WriteProcessMemory(process, buffer, destination, sizeof(buffer), &br)){
+        if(!WriteProcessMemory(GetCurrentProcess(), buffer, destination, sizeof(buffer), &br)) {
             errmsg("WPM Failed");
             return FALSE;
         }
         free(buffer);
+        return TRUE;
     }
 
     PMODULE_INFORMATION_TABLE CreateModuleInformation(IN PPEB pPeb, IN HANDLE process) {
@@ -297,6 +298,7 @@ namespace winutils {
             return NULL;
         }
 
+
         // Allocate the correct amount of memory depending of the modules count
         if ((pModuleInformationTable->Modules = (PMODULE_ENTRY)malloc(Count * sizeof(MODULE_ENTRY))) == NULL) {
             OutputDebugString(L"Cannot allocate a MODULE_INFORMATION_TABLE.\n");
@@ -325,18 +327,46 @@ namespace winutils {
             // RtlCopyMemory(&CurModule->SizeOfImage, &pLdrEntry->SizeOfImage, sizeof(CurModule->SizeOfImage));
             // RtlCopyMemory(&CurModule->BaseAddress, &pLdrEntry->DllBase, sizeof(CurModule->BaseAddress));
             // RtlCopyMemory(&CurModule->EntryPoint, &pLdrEntry->EntryPoint, sizeof(CurModule->EntryPoint));
-            ret = CopyProcessMemory(process, &CurModule->BaseName, &pLdrEntry->BaseDllName, sizeof(CurModule->BaseName));
-            if(!ret) return nullptr;
-            ret = CopyProcessMemory(process, &CurModule->FullName, &pLdrEntry->FullDllName, sizeof(CurModule->FullName));
-            if(!ret) return nullptr;
-            ret = CopyProcessMemory(process, &CurModule->SizeOfImage, &pLdrEntry->SizeOfImage, sizeof(CurModule->SizeOfImage));
-            if(!ret) return nullptr;
-            ret = CopyProcessMemory(process, &CurModule->BaseAddress, &pLdrEntry->DllBase, sizeof(CurModule->BaseAddress));
-            if(!ret) return nullptr;
-            ret = CopyProcessMemory(process, &CurModule->EntryPoint, &pLdrEntry->EntryPoint, sizeof(CurModule->EntryPoint));
-            if(!ret) return nullptr;
+            ret = ReadProcessMemory(process, &pLdrEntry->BaseDllName, &CurModule->BaseName, sizeof(pLdrEntry->BaseDllName), &br);
+            if (!ret) {
+                errmsg(" 0 Failed");
+                return nullptr;
+            }
+            ret = ReadProcessMemory(process, &pLdrEntry->FullDllName, &CurModule->FullName, sizeof(pLdrEntry->FullDllName), &br);
+            if (!ret) {
+                errmsg(" 1 Failed");
+                return nullptr;
+            }
+            ret = ReadProcessMemory(process, &pLdrEntry->SizeOfImage, &CurModule->SizeOfImage, sizeof(pLdrEntry->SizeOfImage), &br);
+            if (!ret) {
+                errmsg(" 2 Failed");
+                return nullptr;
+            }
+            ret = ReadProcessMemory(process, &pLdrEntry->DllBase, &CurModule->BaseAddress, sizeof(pLdrEntry->DllBase), &br);
+            if (!ret) {
+                errmsg(" 3 Failed");
+                return nullptr;
+            };
+            ret = ReadProcessMemory(process, &pLdrEntry->EntryPoint, &CurModule->EntryPoint, sizeof(pLdrEntry->EntryPoint), &br);
+            if (!ret) {
+                errmsg(" 4 Failed");
+                return nullptr;
+            }
 
+            // Sanitise Unicode String - Convert Remote Memory to Local Memory
+            size_t bufbsize = CurModule->BaseName.Length + 1; // its length in bytes not in wchars!
+            size_t buffsize = CurModule->FullName.Length + 1;
+            LPWSTR bufbase = (LPWSTR)malloc(bufbsize);
+            LPWSTR buffull = (LPWSTR)malloc(buffsize);
+            ZeroMemory(bufbase, bufbsize);
+            ZeroMemory(buffull, buffsize);
+            ret = ReadProcessMemory(process, CurModule->BaseName.Buffer, bufbase, bufbsize, &br);
+            if (!ret) errmsg("RPM Failed");
+            ret = ReadProcessMemory(process, CurModule->FullName.Buffer, buffull, buffsize, &br);
+            if (!ret) errmsg("RPM Failed");
 
+            CurModule->BaseName.Buffer = bufbase;
+            CurModule->FullName.Buffer = buffull;
             // Iterate to the next entry
             //pEntry = pEntry->Flink;
             ret = ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
