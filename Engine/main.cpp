@@ -11,6 +11,8 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
+    if(!winutils::SetDebugPrivileges()) errmsg("Debug privileges failed");
+
     GWindow::INIT_COMMON_CONTROLS();
     GWindow::INIT_GDIPLUS();
 

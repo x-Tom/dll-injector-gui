@@ -45,7 +45,7 @@
 
  //    return TRUE;
  //}
-#define errmsg(x) MessageBox(NULL, TEXT(x), NULL,NULL) 
+
 
 //BOOL WModuleListView::Update(){
 //    

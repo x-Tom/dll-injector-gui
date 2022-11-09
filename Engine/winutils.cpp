@@ -134,6 +134,43 @@ BOOL winutils::is_main_window(HWND handle)
 
 namespace winutils {
 
+    bool SetDebugPrivileges()
+    {
+        HANDLE hProc = GetCurrentProcess();
+        if (!hProc)
+            return false;
+
+        HANDLE hToken = nullptr;
+        if (!OpenProcessToken(hProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken))
+        {
+            CloseHandle(hProc);
+            return false;
+        }
+
+        CloseHandle(hProc);
+
+        TOKEN_PRIVILEGES TokenPrivileges = { 0 };
+        TokenPrivileges.PrivilegeCount = 1;
+        TokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+        if (!LookupPrivilegeValue(nullptr, SE_DEBUG_NAME, &TokenPrivileges.Privileges[0].Luid))
+        {
+            CloseHandle(hToken);
+            return false;
+        }
+
+        if (!AdjustTokenPrivileges(hToken, FALSE, &TokenPrivileges, sizeof(TOKEN_PRIVILEGES), nullptr, nullptr))
+        {
+            CloseHandle(hToken);
+            return false;
+        }
+
+        CloseHandle(hToken);
+
+        return true;
+    }
+
+
     PVOID QueryProcessInformation(IN HANDLE Process, IN PROCESSINFOCLASS ProcessInformationClass, IN DWORD ProcessInformationLength) {
 
         PPROCESS_BASIC_INFORMATION pProcessInformation = NULL;

@@ -9,6 +9,7 @@
 #include <mutex>
 
 #define wcsbytes(x) (wcslen(x)+1)*2
+#define errmsg(x) MessageBox(NULL, TEXT(x), NULL,NULL) 
 
 namespace winutils {
 
@@ -124,6 +125,7 @@ namespace winutils {
         OUT PULONG ReturnLength    OPTIONAL
     );
 
+    bool SetDebugPrivileges();
 
     PVOID QueryProcessInformation(IN HANDLE Process, IN PROCESSINFOCLASS ProcessInformationClass, IN DWORD ProcessInformationLength);
 
