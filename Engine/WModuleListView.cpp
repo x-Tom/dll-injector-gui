@@ -1,53 +1,120 @@
 #include "WModuleListView.h"
 
-// BOOL WModuleListView::Update(){
-    
-//     ClearItems();
-    
-//     MODULEENTRY32 me32;
-//     HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetProcessId(process));
-//     if (hModuleSnap == nullptr) {
-//         OutputDebugString(L"Module Snapshot Failed!");
-//         MessageBoxW(NULL, L"Module Snapshot Failed!", NULL, NULL);
-//     }
-    
-//     auto ok = Module32First(hModuleSnap, &me32);
-//     if(!ok) {
-//         OutputDebugString(L"Module32First failed\n");
-//         MessageBoxW(NULL, L"Module32First Failed!", NULL, NULL);
-//         CloseHandle(hModuleSnap);
-//         return FALSE;
-        
-//     }
+ //BOOL WModuleListView::Update(){
+ //   
+ //    ClearItems();
+ //   
+ //    MODULEENTRY32 me32;
+ //    HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetProcessId(process));
+ //    if (hModuleSnap == nullptr) {
+ //        OutputDebugString(L"Module Snapshot Failed!");
+ //        MessageBoxW(NULL, L"Module Snapshot Failed!", NULL, NULL);
+ //    }
+ //   
+ //    auto ok = Module32First(hModuleSnap, &me32);
+ //    if(!ok) {
+ //        OutputDebugString(L"Module32First failed\n");
+ //        MessageBoxW(NULL, L"Module32First Failed!", NULL, NULL);
+ //        CloseHandle(hModuleSnap);
+ //        return FALSE;
+ //       
+ //    }
 
-//    // int i = 0;
-//     std::wstring mod;
-//     std::wstring baseaddr;
-//     HICON icon;
-//     WORD pic;
-// 	do {
+ //   // int i = 0;
+ //    std::wstring mod;
+ //    std::wstring baseaddr;
+ //    HICON icon;
+ //    WORD pic;
+ //	do {
 
-//         mod = me32.szModule;
-//         baseaddr = std::to_wstring((uintptr_t)me32.modBaseAddr);
+ //        mod = me32.szModule;
+ //        baseaddr = std::to_wstring((uintptr_t)me32.modBaseAddr);
 
-//         icon = ExtractIcon(hinst, me32.szExePath, 0);
-//         if (icon == nullptr) {
-//             OutputDebugString(L"icon load failed\n");
-//             icon = ExtractAssociatedIcon(hinst, me32.szExePath, &pic);
-//             if(icon == nullptr) OutputDebugString(L"icon load failed\n");
-//         }
+ //        icon = ExtractIcon(hinst, me32.szExePath, 0);
+ //        if (icon == nullptr) {
+ //            OutputDebugString(L"icon load failed\n");
+ //            icon = ExtractAssociatedIcon(hinst, me32.szExePath, &pic);
+ //            if(icon == nullptr) OutputDebugString(L"icon load failed\n");
+ //        }
 
-//         AddItem(mod, baseaddr, icon); //i++;
+ //        AddItem(mod, baseaddr, icon); //i++;
 
-//     } while (Module32Next(hModuleSnap, &me32));
-    
-//     ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
+ //    } while (Module32Next(hModuleSnap, &me32));
+ //   
+ //    ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
 
-//     return TRUE;
-// }
+ //    return TRUE;
+ //}
+#define errmsg(x) MessageBox(NULL, TEXT(x), NULL,NULL) 
 
-BOOL WModuleListView::Update(){
-    
+//BOOL WModuleListView::Update(){
+//    
+//    ClearItems();
+//
+//    std::wstring mod;
+//    std::wstring baseaddr;
+//    HICON icon;
+//
+//    WORD pic;
+//    DWORD bytesreq = 0;
+//	HMODULE module_array[1024] = { 0 };
+//	if (!EnumProcessModules(process, module_array, sizeof(module_array), &bytesreq)) {
+//		DWORD err = GetLastError();
+//		OutputDebugString(std::to_wstring(err).c_str());
+//        errmsg("EnumProcessModules Failed!");
+//		return FALSE;
+//	}
+//
+//    wchar_t mname_buffer[MAX_PATH] = {0};
+//    wchar_t mpath_buffer[MAX_PATH] = {0};
+//    MODULEINFO mi;
+//
+//
+//	for (auto& hm : module_array) {
+//		if (!GetModuleBaseName(process, hm, mname_buffer, sizeof(mname_buffer))) {
+//			DWORD err = GetLastError();
+//			OutputDebugString(std::to_wstring(err).c_str());
+//            MessageBoxW(NULL, L"GetModuleBaseName failed", NULL, NULL);
+//			return FALSE;
+//		}
+//        if (!GetModuleInformation(process, hm, &mi, sizeof(mi))) {
+//			DWORD err = GetLastError();
+//			OutputDebugString(std::to_wstring(err).c_str());
+//            MessageBoxW(NULL, L"GetModuleInformation failed", NULL, NULL);
+//
+//			return FALSE;
+//		}
+//
+//        if (!GetModuleFileNameEx(process, hm, mpath_buffer, sizeof(mpath_buffer))) {
+//			DWORD err = GetLastError();
+//			OutputDebugString(std::to_wstring(err).c_str());
+//            MessageBoxW(NULL, L"GetModuleFileNameEx failed", NULL, NULL);
+//
+//			return FALSE;
+//		}
+//
+//
+//        icon = ExtractIcon(hinst, mpath_buffer, 0);
+//        if (icon == nullptr) {
+//            OutputDebugString(L"icon load failed\n");
+//            icon = ExtractAssociatedIcon(hinst, mpath_buffer, &pic);
+//            if(icon == nullptr) OutputDebugString(L"icon load failed\n");
+//        }
+//
+//
+//        mod = mname_buffer;
+//        baseaddr = std::to_wstring((uintptr_t)mi.lpBaseOfDll);
+//        
+//		AddItem(mod, baseaddr, icon);
+//	}
+//    
+//    ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
+//
+//    return TRUE;
+//}
+
+BOOL WModuleListView::Update() {
+
     ClearItems();
 
     std::wstring mod;
@@ -56,56 +123,62 @@ BOOL WModuleListView::Update(){
 
     WORD pic;
     DWORD bytesreq = 0;
-	HMODULE module_array[1024] = { 0 };
-	if (!EnumProcessModules(process, module_array, sizeof(module_array), &bytesreq)) {
-		DWORD err = GetLastError();
-		OutputDebugString(std::to_wstring(err).c_str());
-		return nullptr;
-	}
+    HMODULE module_array[1024] = { 0 };
+    if (!EnumProcessModules(process, module_array, sizeof(module_array), &bytesreq)) {
+        DWORD err = GetLastError();
+        OutputDebugString(std::to_wstring(err).c_str());
+        errmsg("EnumProcessModules Failed!");
+        return FALSE;
+    }
 
-    wchar_t mname_buffer[MAX_PATH] = {0};
-    wchar_t mpath_buffer[MAX_PATH] = {0};
+    wchar_t mname_buffer[MAX_PATH] = { 0 };
+    wchar_t mpath_buffer[MAX_PATH] = { 0 };
     MODULEINFO mi;
 
 
+    for (auto& hm : module_array) {
+        if (!GetModuleBaseName(process, hm, mname_buffer, sizeof(mname_buffer))) {
+            DWORD err = GetLastError();
+            OutputDebugString(std::to_wstring(err).c_str());
+            MessageBoxW(NULL, L"GetModuleBaseName failed", NULL, NULL);
+            return FALSE;
+        }
+        if (!GetModuleInformation(process, hm, &mi, sizeof(mi))) {
+            DWORD err = GetLastError();
+            OutputDebugString(std::to_wstring(err).c_str());
+            MessageBoxW(NULL, L"GetModuleInformation failed", NULL, NULL);
 
-	for (auto& hm : module_array) {
-		if (!GetModuleBaseName(process, hm, mname_buffer, sizeof(mname_buffer))) {
-			DWORD err = GetLastError();
-			OutputDebugString(std::to_wstring(err).c_str());
-			return nullptr;
-		}
-        if (!GetModuleInfo(process, hm, &mi, sizeof(mi))) {
-			DWORD err = GetLastError();
-			OutputDebugString(std::to_wstring(err).c_str());
-			return nullptr;
-		}
+            return FALSE;
+        }
 
         if (!GetModuleFileNameEx(process, hm, mpath_buffer, sizeof(mpath_buffer))) {
-			DWORD err = GetLastError();
-			OutputDebugString(std::to_wstring(err).c_str());
-			return nullptr;
-		}
+            DWORD err = GetLastError();
+            OutputDebugString(std::to_wstring(err).c_str());
+            MessageBoxW(NULL, L"GetModuleFileNameEx failed", NULL, NULL);
+
+            return FALSE;
+        }
 
 
         icon = ExtractIcon(hinst, mpath_buffer, 0);
         if (icon == nullptr) {
             OutputDebugString(L"icon load failed\n");
             icon = ExtractAssociatedIcon(hinst, mpath_buffer, &pic);
-            if(icon == nullptr) OutputDebugString(L"icon load failed\n");
+            if (icon == nullptr) OutputDebugString(L"icon load failed\n");
         }
 
 
         mod = mname_buffer;
         baseaddr = std::to_wstring((uintptr_t)mi.lpBaseOfDll);
-        
-		AddItem(mod, baseaddr, icon);
-	}
-    
+
+        AddItem(mod, baseaddr, icon);
+    }
+
     ListView_SetImageList(hwnd, image_list, LVSIL_SMALL);
 
     return TRUE;
 }
+
 
 BOOL WModuleListView::InitListViewColumns() 
 { 
@@ -147,7 +220,7 @@ bool WModuleListView::Create(HWND prnt)
 
     InitListViewColumns();
     InitImageList();
-    Update();
+    //Update();
 
     return (hwnd != nullptr);
 }
