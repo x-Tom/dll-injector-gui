@@ -239,7 +239,7 @@ namespace winutils {
     }
 
 
-    PMODULE_INFORMATION_TABLE CreateModuleInformation( IN PPEB pPeb ) {
+    PMODULE_INFORMATION_TABLE CreateModuleInformation(IN PPEB pPeb, IN HANDLE process) {
 
         ULONG Count = 0;
         ULONG CurCount = 0;
@@ -250,15 +250,26 @@ namespace winutils {
         PLDR_DATA_TABLE_ENTRY pLdrEntry = NULL;
         PMODULE_INFORMATION_TABLE pModuleInformationTable = NULL;
 
-        //READPROCESS MEMORY INSTEAD
-        pLdrData = pPeb->Ldr;
-        pHeadEntry = &pLdrData->InMemoryOrderModuleList;
+        //Every pointer dereference requires instead a ReadProcessMemory as PEB is in remote process
+        size_t br;
+        PEB pebcopy = {0};
+        ReadProcessMemory(process, pPeb, pebcoby, sizeof(PEB), &br);
+        //pLdrData = pPeb->Ldr;
+        pLdrData = pebcopy.Ldr;
 
+        PEB_LDR_DATA ldr_data = {0};
+        ReadProcessMemory(process, pLdrData, ldr_data, sizeof(PEB_LDR_DATA), &br);
+        //pHeadEntry = &pPeb->Ldr->InMemoryOrderModuleList;
+        //pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData - (uintptr_t)32);
+        //pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData - (uintptr_t)(&(PEB_LDR_DATA*)0)->InMemoryOrderModuleList);
+        pHeadEntry = CONTAINING_RECORD(pLdrData, PEB_LDR_DATA, InMemoryOrderModuleList);
         // Count user modules : iterate through the entire list
-        pEntry = pHeadEntry->Flink;
+        LISTENTRY entry = ldr_data.InMemoryOrderModuleList;
+        pEntry = entry.Flink;
         while (pEntry != pHeadEntry) {
             Count++;
-            pEntry = pEntry->Flink;
+            ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
+            pEntry = entry.Flink;
         }
 
         // Allocate a MODULE_INFORMATION_TABLE
@@ -277,8 +288,10 @@ namespace winutils {
         pModuleInformationTable->ModuleCount = Count;
 
         // Fill all the modules information in the table
-        pEntry = pHeadEntry->Flink;
-        while (pEntry != pHeadEntry)
+        entry = ldr_data.InMemoryOrderModuleList;
+        pEntry = entry.Flink;
+        //pEntry = pHeadEntry->Flink;
+        while (pEntry != pHeadEntry) // TODO: some readprocessmemory copying to do in here
         {
             // Retrieve the current MODULE_ENTRY
             CurModule = &pModuleInformationTable->Modules[CurCount++];
@@ -286,6 +299,7 @@ namespace winutils {
             // Retrieve the current LDR_DATA_TABLE_ENTRY
             pLdrEntry = CONTAINING_RECORD(pEntry, LDR_DATA_TABLE_ENTRY, InMemoryOrderModuleList);
 
+            // MAY NEED TO BE REPLACED WITH RPM
             // Fill the MODULE_ENTRY with the LDR_DATA_TABLE_ENTRY information
             RtlCopyMemory(&CurModule->BaseName, &pLdrEntry->BaseDllName, sizeof(CurModule->BaseName));
             RtlCopyMemory(&CurModule->FullName, &pLdrEntry->FullDllName, sizeof(CurModule->FullName));
@@ -294,7 +308,9 @@ namespace winutils {
             RtlCopyMemory(&CurModule->EntryPoint, &pLdrEntry->EntryPoint, sizeof(CurModule->EntryPoint));
 
             // Iterate to the next entry
-            pEntry = pEntry->Flink;
+            //pEntry = pEntry->Flink;
+            ReadProcessMemory(process, pEntry, &entry, sizeof(LIST_ENTRY), &br);
+            pEntry = entry.Flink;
         }
 
         return pModuleInformationTable;

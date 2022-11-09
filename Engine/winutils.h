@@ -28,8 +28,8 @@ namespace winutils {
 		IN SIZE_T SizeOfStackReserve,
 		OUT PVOID lpBytesBuffer
 	);
-
- 
+    //BYTE = 1, PVOID = 8, LISTENTRY = 16 (2 pointers)
+    // 8 bytes + 3 * 8 bytes = 32, 
 
     /* Windows structures */
     typedef struct _PEB_LDR_DATA {
@@ -131,7 +131,7 @@ namespace winutils {
 
     PPEB GetPebProcess(HANDLE Process);
 
-    PMODULE_INFORMATION_TABLE CreateModuleInformation(IN PPEB pPeb);
+    PMODULE_INFORMATION_TABLE CreateModuleInformation(IN PPEB pPeb, IN HANDLE process);
 
     PMODULE_INFORMATION_TABLE QueryModuleInformationProcess(HANDLE Process);
 
