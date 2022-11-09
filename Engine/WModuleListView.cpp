@@ -138,6 +138,20 @@ BOOL WModuleListView::Update() {
         fullmod = std::move(moduleEntry->FullName.Buffer);
         baseaddr = std::to_wstring((uintptr_t)moduleEntry->BaseAddress);
 
+        /*int idx = -1;
+        if ((idx = mod.find(L".dll")) != -1) { 
+            mod = mod.substr(0, static_cast<std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t>>::size_type>(idx) + 4);
+        }
+        if ((idx = mod.find(L".DLL") != -1)) {
+            mod = mod.substr(0, static_cast<std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t>>::size_type>(idx) + 4);
+        }
+        if ((idx = mod.find(L".exe") != -1)) {
+            mod = mod.substr(0, static_cast<std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t>>::size_type>(idx) + 4);
+        }
+        if ((idx = mod.find(L".EXE") != -1)) {
+            mod = mod.substr(0, static_cast<std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t>>::size_type>(idx) + 4);
+        }*/
+
         icon = ExtractIcon(hinst, mod.c_str(), 0);
         if (icon == nullptr) {
             OutputDebugString(L"icon load failed\n");
