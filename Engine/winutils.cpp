@@ -260,9 +260,9 @@ namespace winutils {
         PEB_LDR_DATA ldr_data = {0};
         ReadProcessMemory(process, pLdrData, &ldr_data, sizeof(PEB_LDR_DATA), &br);
         //pHeadEntry = &pPeb->Ldr->InMemoryOrderModuleList;
-        //pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData - (uintptr_t)32);
-        //pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData - (uintptr_t)(&(PEB_LDR_DATA*)0)->InMemoryOrderModuleList);
-        pHeadEntry = (PLIST_ENTRY)CONTAINING_RECORD(pLdrData, PEB_LDR_DATA, InMemoryOrderModuleList);
+        //pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData + (uintptr_t)32);
+        pHeadEntry = (PLIST_ENTRY)((uintptr_t)pLdrData + (uintptr_t)(&(PEB_LDR_DATA*)0)->InMemoryOrderModuleList);
+        //pHeadEntry = (PLIST_ENTRY)CONTAINING_RECORD(pLdrData, PEB_LDR_DATA, InMemoryOrderModuleList);
         // Count user modules : iterate through the entire list
         LIST_ENTRY entry = ldr_data.InMemoryOrderModuleList;
         pEntry = entry.Flink;
