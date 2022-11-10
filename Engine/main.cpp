@@ -10,6 +10,7 @@
 #include "WModuleListView.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+    //setlocale(LC_ALL, "");
 
     if(!winutils::SetDebugPrivileges()) errmsg("Debug privileges failed");
 

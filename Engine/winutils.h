@@ -125,7 +125,7 @@ namespace winutils {
         OUT PULONG ReturnLength    OPTIONAL
     );
 
-    void truncate_wstr_after_pattern(IN OUT wchar_t* str, IN wchar_t* pattern, IN size_t slen, IN size_t plen);
+    void truncate_wstr_after_pattern(wchar_t* str,const wchar_t* pattern, size_t slen, size_t plen);
 
     bool SetDebugPrivileges();
 
