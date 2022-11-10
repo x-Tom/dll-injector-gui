@@ -134,6 +134,24 @@ BOOL winutils::is_main_window(HWND handle)
 
 namespace winutils {
 
+
+
+
+    //_wcsicmp
+    //
+    //
+
+    void truncate_wstr_after_pattern(wchar_t* str, wchar_t* pattern, size_t slen, size_t plen){
+        size_t i = 0;
+        wchar_t* substr = (wchar_t*)calloc(plen * sizeof(wchar_t) + 1, 1);
+        for(;i < slen+1-plen;i++){
+            memcpy(substr, str+i, plen * sizeof(wchar_t));
+            if(!_wcsicmp(substr, pattern)) break;
+        }
+        memset(str+i+plen, 0, (slen+1-i-plen) * sizeof(wchar_t));
+        free(substr);
+    }
+
     bool SetDebugPrivileges()
     {
         HANDLE hProc = GetCurrentProcess();
@@ -356,14 +374,17 @@ namespace winutils {
             // Sanitise Unicode String - Convert Remote Memory to Local Memory
             size_t bufbsize = CurModule->BaseName.Length + 1; // its length in bytes not in wchars!
             size_t buffsize = CurModule->FullName.Length + 1;
-            LPWSTR bufbase = (LPWSTR)malloc(bufbsize);
-            LPWSTR buffull = (LPWSTR)malloc(buffsize);
-            ZeroMemory(bufbase, bufbsize);
-            ZeroMemory(buffull, buffsize);
+            LPWSTR bufbase = (LPWSTR)calloc(bufbsize,1);
+            LPWSTR buffull = (LPWSTR)calloc(buffsize,1);
             ret = ReadProcessMemory(process, CurModule->BaseName.Buffer, bufbase, bufbsize, &br);
             if (!ret) errmsg("RPM Failed");
             ret = ReadProcessMemory(process, CurModule->FullName.Buffer, buffull, buffsize, &br);
             if (!ret) errmsg("RPM Failed");
+
+            truncate_wstr_after_pattern(bufbase, L".exe", wsclen(bufbase), 4);
+            truncate_wstr_after_pattern(bufbase, L".dll", wsclen(bufbase), 4);
+            truncate_wstr_after_pattern(buffull, L".exe", wsclen(buffull), 4);
+            truncate_wstr_after_pattern(buffull, L".dll", wsclen(buffull), 4);
 
             CurModule->BaseName.Buffer = bufbase;
             CurModule->FullName.Buffer = buffull;

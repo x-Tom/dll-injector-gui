@@ -125,6 +125,8 @@ namespace winutils {
         OUT PULONG ReturnLength    OPTIONAL
     );
 
+    void truncate_wstr_after_pattern(IN OUT wchar_t* str, IN wchar_t* pattern, IN size_t slen, IN size_t plen);
+
     bool SetDebugPrivileges();
 
     PVOID QueryProcessInformation(IN HANDLE Process, IN PROCESSINFOCLASS ProcessInformationClass, IN DWORD ProcessInformationLength);
