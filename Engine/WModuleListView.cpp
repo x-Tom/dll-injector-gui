@@ -134,9 +134,9 @@ BOOL WModuleListView::Update() {
     for (size_t moduleIndex = 0; moduleIndex < moduleTable->ModuleCount; moduleIndex++)
     {
         MODULE_ENTRY* moduleEntry = &moduleTable->Modules[moduleIndex];
-        mod = std::move(moduleEntry->BaseName.Buffer);
-        fullmod = std::move(moduleEntry->FullName.Buffer);
-        baseaddr = std::to_wstring((uintptr_t)moduleEntry->BaseAddress);
+        std::wstring mod(moduleEntry->BaseName.Buffer);
+        std::wstring fullmod(moduleEntry->FullName.Buffer);
+        std::wstring baseaddr(std::to_wstring((uintptr_t)moduleEntry->BaseAddress));
 
         icon = ExtractIcon(hinst, mod.c_str(), 0);
         if (icon == nullptr) {
@@ -146,8 +146,8 @@ BOOL WModuleListView::Update() {
             if(icon == nullptr) OutputDebugString(L"icon load failed\n");
         }
 
-        //free(moduleEntry->BaseName.Buffer);
-        //free(moduleEntry->FullName.Buffer);
+        free(moduleEntry->BaseName.Buffer);
+        free(moduleEntry->FullName.Buffer);
 
         AddItem(mod, baseaddr, icon);
     }
