@@ -6,14 +6,30 @@
 #include <SubAuth.h>
 #include <iostream>
 #include <string>
-#include <mutex>
 
 #define wcsbytes(x) (wcslen(x)+1)*2
 #define errmsg(x) MessageBox(NULL, TEXT(x), NULL,NULL) 
 
 namespace winutils {
 
-	
+
+
+    typedef NTSTATUS (NTAPI *pLdrLoadDll)(
+        IN PWCHAR               PathToFile OPTIONAL,
+        IN ULONG                Flags OPTIONAL,
+        IN PUNICODE_STRING      ModuleFileName,
+        OUT PHANDLE             ModuleHandle 
+    );
+
+    struct LDR_PARAMS {
+        IN PWCHAR               PathToFile OPTIONAL,
+        IN ULONG                Flags OPTIONAL,
+        IN PUNICODE_STRING      ModuleFileName,
+        OUT PHANDLE             ModuleHandle 
+    }
+
+
+	NTSTATUS NTAPI LdrLoadDllWrapper(LDR_PARAMS*);
 
 	typedef NTSTATUS (NTAPI *pNtCreateThreadEx) (
 		OUT PHANDLE hThread,

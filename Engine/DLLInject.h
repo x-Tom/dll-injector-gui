@@ -6,7 +6,7 @@
 
 
 
-#define wcsbytes(x) (wcslen(x)+1)*2
+#define wcsbytes(x) (wcslen(x)+1)*sizeof(wchar_t)
 
 
 class dllinject {
@@ -15,6 +15,7 @@ public:
 
 	enum {
 		LOADLIBRARYEXW = 1,
+		LDRLOADDLL,
 		MANUALMAP,
 		CREATEREMOTETHREADEX = 1 << 16,
 		NTCREATETHREADEX,

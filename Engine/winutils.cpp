@@ -132,25 +132,17 @@ BOOL winutils::is_main_window(HWND handle)
 	return GetWindow(handle, GW_OWNER) == (HWND)0;
 }
 
+
 namespace winutils {
-
-
-
-
-    //_wcsicmp
-    //
-    //
-
-    void truncate_wstr_after_pattern(wchar_t* str, const wchar_t* pattern, size_t slen, size_t plen){
-        size_t i = 0;
-        wchar_t* substr = (wchar_t*)calloc(plen * sizeof(wchar_t) + 1, 1);
-        for(;i < slen+1-plen;i++){
-            memcpy(substr, str+i, plen * sizeof(wchar_t));
-            if(!wcscmp(substr, pattern)) break;
-        }
-        memset(str+i+plen, 0, (slen+1-i-plen) * sizeof(wchar_t));
-        free(substr);
-    }
+    
+    NTSTATUS NTAPI LdrLoadDllWrapper(LDR_PARAMS* params){
+        HMODULE hntdll;
+        pLdrLoadDll LdrLoadDll;
+        if((hntdll = LoadLibrary(L"ntdll")) == nullptr) return TRUE;
+        if((LdrLoadDll = (pLdrLoadDll)GetProcAddress(hntdll, "LdrLoadDll")) == nullptr) return TRUE;
+        
+        return LdrLoadDll(params->PathToFile, params->Flags, params->ModuleFileName, params->ModuleHandle);
+    };
 
 
     bool SetDebugPrivileges()
@@ -255,23 +247,6 @@ namespace winutils {
         free(pProcessInformation);
 
         return pPeb;
-    }
-
-
-    BOOL CopyProcessMemory(HANDLE process, void* destination, void* source, size_t size){
-        size_t br;
-        BYTE* buffer = (BYTE*)malloc(size);
-        if(!ReadProcessMemory(process, source, buffer, sizeof(buffer), &br)){
-            DWORD err = GetLastError();
-            errmsg("RPM Failed");
-            return FALSE;
-        }
-        if(!WriteProcessMemory(GetCurrentProcess(), buffer, destination, sizeof(buffer), &br)) {
-            errmsg("WPM Failed");
-            return FALSE;
-        }
-        free(buffer);
-        return TRUE;
     }
 
     PMODULE_INFORMATION_TABLE CreateModuleInformation(IN PPEB pPeb, IN HANDLE process) {

@@ -79,36 +79,54 @@ DWORD dllinject::eject()
 }
 
 DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
-	void* dllpath_address = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
+	DWORD dword;
+	LPVOID funcptr = nullptr;
+	HANDLE hthread = nullptr;
 
-	if (dllpath_address == nullptr) {
-		MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
-		return 1;
+	void* rparams; //remote params
+	// allocate dllpath buffer into remote process and write bytes into it  
+	void* dllpath_raddr = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+	if (dllpath_raddr == nullptr) {
+			MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
+			return 1;
 	}
-	int write_status = WriteProcessMemory(process, dllpath_address, dllpath, wcsbytes(dllpath), NULL);  // may need to put this in switch
+	int write_status = WriteProcessMemory(process, dllpath_raddr, dllpath, wcsbytes(dllpath), NULL);  // may need to put this in switch
 	if (write_status == FALSE) {
 		MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
 		return 1;
 	}
-	DWORD dword;
-	LPVOID funcpointer = nullptr;
-	HANDLE hthread = nullptr;
 
 	switch (options & 0xffff) {
 	case LOADLIBRARYEXW:
 		
-		funcpointer = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "LoadLibraryW");
-		if (funcpointer == nullptr) {
+		funcptr = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "LoadLibraryW");
+		if (funcptr == nullptr) {
 			MessageBox(NULL, L"Failed to load LoadLibraryW", L"Injection Failed", NULL);
 			return 1;
 		}
+
+		rparams = dllpath_raddr;
+
+		
+		
+		break;
+	case LDRLOADDLL:
+
+		funcptr = (LPVOID)winutils::LdrLoadDllWrapper;
+		
+		winutils::LDR_PARAMS ldr_params;
+		UNICODE_STRING ustr;
+
+		//rparams = ;
+
+
 		break;
 	}
 
 	switch (options & (0xffff << 16)) {
 	case CREATEREMOTETHREADEX:
-
-		hthread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)funcpointer, dllpath_address, 0, &dword);
+		hthread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)funcptr, rparams, 0, &dword);
 		if (hthread == nullptr) {
 			MessageBox(NULL, L"Failed to Create Remote Thread", L"Injection Failed", NULL);
 			return 1;
@@ -116,7 +134,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		break;
 	case NTCREATETHREADEX:
 		winutils::pNtCreateThreadEx NtCreateThreadEx = (winutils::pNtCreateThreadEx)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtCreateThreadEx");
-		NtCreateThreadEx(&hthread, 0x1FFFFF, NULL, process, (LPTHREAD_START_ROUTINE) funcpointer, dllpath_address, FALSE, NULL, NULL, NULL, NULL);
+		NtCreateThreadEx(&hthread, 0x1FFFFF, NULL, process, (LPTHREAD_START_ROUTINE) funcptr, rparams, FALSE, NULL, NULL, NULL, NULL);
 		if (hthread == nullptr) {
 			MessageBox(NULL, L"Failed to NtCreateThreadEx", L"Injection Failed", NULL);
 			return 1;
@@ -124,90 +142,9 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		break;
 	}
 
-	/*wsOutputDebugString(buf, L"Remote Thread Handle: %x\n", hthread);
-	OutputDebugString(buf);*/
-
 	CloseHandle(hthread);
     CloseHandle(process);
-	
-	//if()
 
 	return 0;
 }
 
-
-
-
-
-// DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
-// 	void* dllpath_address = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE); // may need to put this in switch
-// 	wchar_t buf[MAX_PATH] = { 0 };
-// 	wsOutputDebugString(buf, L"DLL file path: %s\n", dllpath, process);
-// 	OutputDebugString(buf);
-// 	wsOutputDebugString(buf, L"Remote Process Handle: %x\n", process);
-// 	OutputDebugString(buf);
-// 	wsOutputDebugString(buf, L"DLL file path string parameter address in target process: %x\n", dllpath_address);
-// 	OutputDebugString(buf);
-// 	if (dllpath_address == nullptr) {
-// 		MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
-// 		return 1;
-// 	}
-// 	int write_status = WriteProcessMemory(process, dllpath_address, dllpath, wcsbytes(dllpath), NULL);  // may need to put this in switch
-// 	if (write_status == FALSE) {
-// 		MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
-// 		return 1;
-// 	}
-// 	DWORD dword;
-// 	LPVOID funcpointer = nullptr;
-// 	HANDLE hthread = nullptr;
-
-// 	switch (options & 0xffff) {
-// 	case LOADLIBRARYEXW:
-		
-// 		funcpointer = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "LoadLibraryW");
-// 		if (funcpointer == nullptr) {
-// 			MessageBox(NULL, L"Failed to load LoadLibraryW", L"Injection Failed", NULL);
-// 			return 1;
-// 		}
-// 		break;
-// 	}
-
-// 	wsOutputDebugString(buf, L"LoadLibraryW Function Pointer: %x\n", funcpointer);
-// 	OutputDebugString(buf);
-
-// 	switch (options & (0xffff << 16)) {
-// 	case CREATEREMOTETHREADEX:
-
-// 		hthread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)funcpointer, dllpath_address, 0, &dword);
-// 		if (hthread == nullptr) {
-// 			MessageBox(NULL, L"Failed to Create Remote Thread", L"Injection Failed", NULL);
-// 			return 1;
-// 		}
-// 		break;
-// 	}
-
-// 	wsOutputDebugString(buf, L"Remote Thread Handle: %x\n", hthread);
-// 	OutputDebugString(buf);
-
-	
-	
-// 	//if()
-
-// 	return 0;
-// }
-
-
-
-
-//void dllinject::INJLoadSet(int i){
-//	inj_load_idx = i;
-//}
-//void dllinject::INJExecSet(int i){
-//	inj_exec_idx = i;
-//}
-//int  dllinject::INJLoadGet(){
-//	return inj_load_idx;
-//}
-//int  dllinject::INJExecGet() {
-//	return inj_exec_idx;
-//}
