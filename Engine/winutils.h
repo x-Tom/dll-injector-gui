@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#define wcsbytes(x) (wcslen(x)+1)*2
+#define wcsbytes(x) (wcslen(x)+1)*sizeof(wchar_t)
 #define errmsg(x) MessageBox(NULL, TEXT(x), NULL,NULL) 
 
 namespace winutils {

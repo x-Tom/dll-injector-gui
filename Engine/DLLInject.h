@@ -6,7 +6,7 @@
 
 
 
-#define wcsbytes(x) (wcslen(x)+1)*sizeof(wchar_t)
+// #define wcsbytes(x) (wcslen(x)+1)*sizeof(wchar_t)
 
 
 class dllinject {

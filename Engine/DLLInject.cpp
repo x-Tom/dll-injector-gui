@@ -91,8 +91,8 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 			MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
 			return 1;
 	}
-	int write_status = WriteProcessMemory(process, dllpath_raddr, dllpath, wcsbytes(dllpath), NULL);  // may need to put this in switch
-	if (write_status == FALSE) {
+	int ws = WriteProcessMemory(process, dllpath_raddr, dllpath, wcsbytes(dllpath), NULL);  // may need to put this in switch
+	if (ws == FALSE) {
 		MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
 		return 1;
 	}
@@ -116,9 +116,37 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		funcptr = (LPVOID)winutils::LdrLoadDllWrapper;
 		
 		winutils::LDR_PARAMS ldr_params;
-		UNICODE_STRING ustr;
 
-		//rparams = ;
+		// typedef struct _UNICODE_STRING {
+		// 	USHORT Length;
+		// 	USHORT MaximumLength;
+		// 	PWSTR  Buffer;
+		// } UNICODE_STRING, *PUNICODE_STRING;
+
+		// struct LDR_PARAMS {
+		// 	IN PWCHAR               PathToFile OPTIONAL,
+		// 	IN ULONG                Flags OPTIONAL,
+		// 	IN PUNICODE_STRING      ModuleFileName,
+		// 	OUT PHANDLE             ModuleHandle 
+    	// }
+
+		UNICODE_STRING ustr;
+		ustr.Length = wcsbytes(dllpath) - sizeof(wchar_t);
+		ustr.MaximumLength = wcsbytes(dllpath);
+		ustr.Buffer = dllpath_raddr;
+
+		void* ustr_raddr = VirtualAllocEx(process, 0, sizeof(ustr), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+		if (ustr_raddr == nullptr) {
+			MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
+			return 1;
+		}
+		ws = WriteProcessMemory(process, ustr_raddr, &ustr, sizeof(ustr), NULL);
+		if (ws == FALSE) {
+			MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
+			return 1;
+		}
+		LDR_PARAMS ldr;
+		ldr.PathToFile = dllpath_raddr
 
 
 		break;
