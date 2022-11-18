@@ -53,7 +53,15 @@ public:
 
 private:
 	
+	static void ManualMap();
 	static DWORD _injectfpath(LPWSTR, HANDLE, DWORD);
 	static DWORD _injectrpath(std::wstring, HANDLE, DWORD);
 	
 };
+
+namespace injutils {
+	struct MAN_MAP_DATA {
+		
+	}
+	void  __stdcall shellcode()
+}

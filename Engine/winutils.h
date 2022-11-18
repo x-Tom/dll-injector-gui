@@ -4,6 +4,7 @@
 #include <tlhelp32.h>
 #include <Psapi.h>
 #include <SubAuth.h>
+#include <winnt.h>
 #include <iostream>
 #include <string>
 

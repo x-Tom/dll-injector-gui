@@ -18,8 +18,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     GWindow::INIT_GDIPLUS();
 
     int const width = MV_SCREENWIDTH/3.5, height = MV_SCREENHEIGHT/2.5;
-    std::vector<std::wstring> inj1 = {L"LoadLibraryExW", L"ManualMap", L"LdrLoadDll",  L"LdrpLoadDll", L"LdrpLoadDllInternal" };
-    std::vector<std::wstring> inj2 = { L"CreateRemoteThreadEx",L"NtCreateThreadEx", L"Thread Hijacking", L"SetWindowsHookEx", L"QueueUserAPC", L"KernelCallback"};
+    std::vector<std::wstring> inj1 = {L"LoadLibraryExW",L"LdrLoadDll", L"ManualMap"};
+    std::vector<std::wstring> inj2 = {L"CreateRemoteThreadEx",L"NtCreateThreadEx", L"Thread Hijacking", L"SetWindowsHookEx", L"QueueUserAPC", L"KernelCallback"};
 
     WMain MainWindow(hInstance, L"Dynamic-link Library Injector", CW_USEDEFAULT, CW_USEDEFAULT, width, height);
 
