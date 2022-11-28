@@ -15,7 +15,7 @@ GWindow::~GWindow()
 
 LRESULT __stdcall GWindow::_WindowProcSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    // use create parameter passed in from CreateWindow() to store window class pointer at WinAPI side
+    // use create parameter passed in from CreateWindow() to store window class pointer at winutils side
     if (msg == WM_NCCREATE)
     {
         // extract ptr to window class from creation data
@@ -26,7 +26,7 @@ LRESULT __stdcall GWindow::_WindowProcSetup(HWND hWnd, UINT msg, WPARAM wParam, 
 
         pWnd->hwnd = hWnd;
 
-        // set WinAPI-managed user data to store ptr to window class
+        // set winutils-managed user data to store ptr to window class
         SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd)); //sets internal window custom user data to this
         // set message proc to normal (non-setup) handler now that setup is finished
         SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&GWindow::_WindowProc)); // changes window procedure to the next static 

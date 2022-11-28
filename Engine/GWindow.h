@@ -28,7 +28,7 @@ public:
 	virtual bool LoadBitmaps();
 	static BOOL INIT_COMMON_CONTROLS();
 	static BOOL INIT_GDIPLUS();
-	HWND Handle();
+	virtual HWND Handle();
 	LPCWSTR GetClass();
 
 protected:

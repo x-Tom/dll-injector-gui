@@ -1,6 +1,8 @@
 #include "WMain.h"
 #include "WText.h"
 #include "WButton.h"
+//#include "WProcessListView.h"
+#include "WModuleListView.h"
 
 
 WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
@@ -33,7 +35,7 @@ bool WMain::Create(HWND)
         0, wndClassName,
         title.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
         x, y, w, h,
-        nullptr, nullptr, hinst, this // pass in this to WinAPI so it can get access to member function from static function
+        nullptr, nullptr, hinst, this // pass in this to winapi so it can get access to member function from static function
     );
 
     if (hwnd == nullptr) {
@@ -47,8 +49,8 @@ bool WMain::Create(HWND)
 
 LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    
+    switch (msg) {
     case WM_DESTROY:
         Kill();
         break;
@@ -60,13 +62,77 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         CreateChildren();
         SendMessage(hwnd, WM_CHANGEUISTATE, (WPARAM)MAKELONG(UIS_SET, UISF_HIDEFOCUS), 0);
         SetGlobalFont();
+
+       /* for (auto& chld : children) {
+            if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
+                EnableWindow(static_cast<GChild*>(chld)->Handle(), FALSE);
+            }
+        }*/
+
+        break;
+    case WM_NOTIFY:
+        switch (((LPNMHDR)lParam)->code) {
+            case NM_CLICK:
+                auto lpnmitem = (LPNMITEMACTIVATE) lParam;
+                std::wstring exe;
+                std::wstring pid;
+                for (auto& chld : children) {
+                    /*HWND lvhwnd = static_cast<GChild*>(chld)->Handle();*/
+                    HMENU id = static_cast<GChild*>(chld)->GetID();
+                    if(id == LISTVIEW1) {
+                        auto lv = static_cast<WProcessListView*>(chld);
+                        for(auto& [key,val] : lv->process_items){
+                            if(val.index == lpnmitem->iItem) {
+                                exe = key;
+                                pid = val.subitem_name;
+                                for (auto& child : children) {
+                                    HMENU id = static_cast<GChild*>(child)->GetID();
+                                    if (id == EDIT1) {
+                                        SetWindowText(static_cast<GChild*>(child)->Handle(), exe.c_str());
+                                    }
+                                    if (id == EDIT2) {
+                                        SetWindowText(static_cast<GChild*>(child)->Handle(), pid.c_str());
+                                    }
+                                    if (id == LISTVIEW2) {
+                                        auto mlv = static_cast<WModuleListView*>(child);
+                                        //MessageBox(NULL, pid.c_str(), NULL, NULL);
+                                        mlv->process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, std::stoi(pid));
+                                        mlv->Update();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            break;
+        }
         break;
     case WM_COMMAND:
         switch (HIWORD(wParam)) {
         case BN_CLICKED:
             switch (LOWORD(wParam)) {
+            case (int)BUTTONFILE:
+                app->opfninit();
+                GetOpenFileName(&app->opfn);
+                for (auto& chld : children) {
+                    if (static_cast<GChild*>(chld)->GetID() == EDIT3) {
+                        SetWindowText(static_cast<GChild*>(chld)->Handle(), app->opfn.lpstrFileTitle);
+                        //MessageBox(NULL, app->opfn.lpstrFile, NULL, MB_OK);
+                        //OutputDebugString(app->opfn.lpstrFile);
+                    }
+                }
+                break;
             case (int)BUTTONINJ:
                 app->inject();
+            case (int)BUTTONEJ:
+                //app->eject();
+                break;
+            case (int)BUTTONCHECK:
+                for (auto& chld : children) {
+                    if (static_cast<WProcessListView*>(chld)->GetID() == LISTVIEW1 || static_cast<WProcessListView*>(chld)->GetID() == LISTVIEW2) 
+                        static_cast<WProcessListView*>(chld)->autoupdate = !static_cast<WProcessListView*>(chld)->autoupdate;
+                }
                 break;
             case (int)RADIO1: //set injector to inject by process name
                 app->pnorid = true;
@@ -97,18 +163,17 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             break;
         case EN_CHANGE:
-            int len = GetWindowTextLength((HWND)lParam);
-            LPWSTR str = (LPWSTR)malloc(len);
-            GetWindowText((HWND)lParam, str, len);
+            int len = GetWindowTextLength((HWND)lParam) + 1;
             switch (LOWORD(wParam)) {
-                case (int)EDIT1:
-                    app->procname = str;
+            case (int)EDIT1:
+                GetWindowText((HWND)lParam, app->procname, len);
                 break;
-                case (int)EDIT2:
-                    app->procid = (DWORD)_wtoi(str);
+            case (int)EDIT2:
+                GetWindowText((HWND)lParam, app->procid, len);
                 break;
-                case (int)EDIT3: 
-                    app->dllrpath = str; 
+            // case (int)EDIT3: 
+            //     app->dllrpath = str;
+            //     break;
             }
             break;
         }
@@ -116,12 +181,7 @@ LRESULT WMain::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         //this->ConfigureEnumChildWindows();
         break;
-    case WM_CTLCOLORSTATIC: // IDEALLY WE DONT WANT TO USE WC_STATIC CONTROL CHILD WINDOWS!!
-        // void* pctl;
-        // for(auto child : children){
-        //     if(child.Handle() == lParam) pctl = child;
-        // }
-
+    case WM_CTLCOLORSTATIC:
     {
         // pctl->Background((HDC) wParam);
         HDC hdcStatic = (HDC)wParam;

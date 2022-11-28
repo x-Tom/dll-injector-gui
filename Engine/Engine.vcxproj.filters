@@ -42,10 +42,16 @@
     <ClCompile Include="WEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="winapi.cpp">
+    <ClCompile Include="winutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DLLInject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WProcessListView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WModuleListView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,10 +89,16 @@
     <ClInclude Include="DLLInject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="winapi.h">
+    <ClInclude Include="winutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WProcessListView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WModuleListView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

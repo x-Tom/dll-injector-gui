@@ -125,9 +125,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -139,9 +140,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -155,7 +157,9 @@
     <ClCompile Include="WButton.cpp" />
     <ClCompile Include="WComboBox.cpp" />
     <ClCompile Include="WEdit.cpp" />
-    <ClCompile Include="winapi.cpp" />
+    <ClCompile Include="winutils.cpp" />
+    <ClCompile Include="WModuleListView.cpp" />
+    <ClCompile Include="WProcessListView.cpp" />
     <ClCompile Include="WMain.cpp" />
     <ClCompile Include="GStatic.cpp" />
     <ClCompile Include="WText.cpp" />
@@ -169,8 +173,10 @@
     <ClInclude Include="WButton.h" />
     <ClInclude Include="WComboBox.h" />
     <ClInclude Include="WEdit.h" />
-    <ClInclude Include="winapi.h" />
+    <ClInclude Include="winutils.h" />
     <ClInclude Include="WinHeader.h" />
+    <ClInclude Include="WModuleListView.h" />
+    <ClInclude Include="WProcessListView.h" />
     <ClInclude Include="WMain.h" />
     <ClInclude Include="GStatic.h" />
     <ClInclude Include="WText.h" />
