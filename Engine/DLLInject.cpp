@@ -230,7 +230,7 @@ void* dllinject::ManualMap(HANDLE process, LPCWSTR dllpath, OUT void** _tbase /*
 		return;
 	}
 
-	std::ifstream DLLFileL(dllpath, std::ios::binary | std::ios::ate);
+	std::ifstream DLLFile(dllpath, std::ios::binary | std::ios::ate);
 	if(DLLFile.fail()) {
 		errmsg("File couldnt be opende for wrtie!");
 		return;
