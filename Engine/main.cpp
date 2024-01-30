@@ -17,7 +17,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     GWindow::INIT_COMMON_CONTROLS();
     GWindow::INIT_GDIPLUS();
 
-    int const width = MV_SCREENWIDTH/3.5, height = MV_SCREENHEIGHT/2.5;
+    //int const width = MV_SCREENWIDTH/3.5, height = MV_SCREENHEIGHT/2.5; // 2560x1440
+    int const width = MV_SCREENWIDTH / 2.6, height = MV_SCREENHEIGHT / 1.8; // 1920x1080
     std::vector<std::wstring> inj1 = {L"LoadLibraryExW",L"LdrLoadDll", L"ManualMap"};
     std::vector<std::wstring> inj2 = {L"CreateRemoteThreadEx",L"NtCreateThreadEx", L"Thread Hijacking", L"SetWindowsHookEx", L"QueueUserAPC", L"KernelCallback"};
 
