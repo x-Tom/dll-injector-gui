@@ -82,7 +82,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 	LPVOID funcptr = nullptr;
 	HANDLE hthread = nullptr;
 
-	void* rparams; //remote params
+	void* rparams = nullptr; //remote params
 	// allocate dllpath buffer into remote process and write bytes into it  
 	void* dllpath_raddr = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 	LPWSTR dllname = (CONTAINING_RECORD(dllpath, OPENFILENAME, lpstrFile))->lpstrFileTitle;
@@ -145,12 +145,12 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 
 		// void
 
-		PHANDLE rhmodule = VirtualAllocEx(process, 0, sizeof(HANDLE), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+		PHANDLE rhmodule = (PHANDLE)VirtualAllocEx(process, 0, sizeof(HANDLE), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 		UNICODE_STRING ustr;
 		ustr.Length = wcsbytes(dllname) - sizeof(wchar_t);
 		ustr.MaximumLength = wcsbytes(dllname);
-		ustr.Buffer = dllname_raddr;
+		ustr.Buffer = (PWSTR)dllname_raddr;
 
 
 		void* ustr_raddr = VirtualAllocEx(process, 0, sizeof(ustr), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -163,12 +163,13 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 			MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
 			return 1;
 		}
-		LDR_PARAMS ldr;
-		ldr.PathToFile = dllpath_raddr;
+		winutils::LDR_PARAMS ldr;
+		ldr.PathToFile = (PWSTR)dllpath_raddr;
 		ldr.Flags = 0;
-		ldr.ModuleFileName = ustr_raddr;
+		ldr.ModuleFileName = (PUNICODE_STRING)ustr_raddr;
 		ldr.ModuleHandle = rhmodule;
 		
+
 		void* ldr_raddr = VirtualAllocEx(process, 0, sizeof(ldr), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 		if (ldr_raddr == nullptr) {
 			MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
@@ -184,11 +185,11 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 
 		break;
 
-	case MANUALMAP:
-		//void* tbase;
-		funcptr = ManualMap(processs, dllpath, &tbase);
-		rparams = tbase;
-		break;
+	//case MANUALMAP:
+	//	//void* tbase;
+	//	funcptr = ManualMap(process, dllpath, &tbase);
+	//	rparams = tbase;
+	//	break;
 	}
 
 	switch (options & (0xFFFF << 16)) {
@@ -209,7 +210,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		break;
 	}
 
-	ManualMapCleanup(process, funcptr, &tbase);
+	//dllinject::ManualMapCleanup(process, funcptr, &tbase);
 
 	CloseHandle(hthread);
     CloseHandle(process);
@@ -217,177 +218,177 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 	return 0;
 }
 
-void* dllinject::ManualMap(HANDLE process, LPCWSTR dllpath, OUT void** _tbase /*,OUT void** _mmdata*/){
-	BYTE* src_data = nullptr;
-	IMAGE_NT_HEADERS* old_nt_header = nullptr;
-	IMAGE_OPTIONAL_HEADER* old_opt_header = nullptr;
-	IMAGE_FILE_HEADER* old_file_header = nullptr;
-	BYTE* target_base = nullptr;
-	//DWORD chk = 0;
-
-	if(!GetFileAttributes(dllpath)) {
-		errmsg("File doesnt exist");
-		return;
-	}
-
-	std::ifstream DLLFile(dllpath, std::ios::binary | std::ios::ate);
-	if(DLLFile.fail()) {
-		errmsg("File couldnt be opende for wrtie!");
-		return;
-	}
-
-	auto size = DLLFile.tellg();
-
-	if(size < 0x1000) {
-		errmsg("File doesnt follow PE format and is invalid");
-		DLLFile.close();
-		return;
-	}
-
-	src_data = new BYTE[(uintptr_t)(size)];
-	if(stc_date = nullptr) {
-		errmsg("Allocation failed, not enough memory in current process");
-		return;	
-	}
-
-	DLLFile.seekg(0, std::ios::beg);
-	DLLFile.read((char*)src_data, size);
-	DLLFile.close;
-
-	if( ((IMAGE_DOS_HEADER*)src_data)->e_mageic != IMAGE_DOS_SIGNATURE){ // IMAGE_DOS_SIGNATURE == 5A4D == MZ
-		errmsg("Not a PE file!");
-		return;
-	}
-	old_nt_header = (IMAGE_NT_HEADERS*)(src_data + ((IMAGE_DOS_HEADER*)src_data)->e_lfanew);
-	old_opt_header = &old_nt_header->OptionalHeader;
-	old_file_header = &old_nt_header->FileHeader;
-
-	if(old_nt_header->Signature != IMAGE_NT_SIGNATURE) {
-		errmsg("Not x64!");
-		return;
-	}
-	if(old_file_header->Machine != IMAGE_FILE_MACHINE_AMD64){
-		errmsg("Not a PE file!");
-		return;
-	}
-
-	target_base = (BYTE*)VirtualAllocEx(process, (void*)old_opt_header->ImageBase, old_opt_header->SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	if(target_base == nullptr) target_base = (BYTE*)VirtualAllocEx(process, nullptr, old_opt_header->SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	if(!target_base) {
-		errmsg("Allocation in target failed!");
-		delete[] src_data;
-		return;
-	}
-
-	MANUALMAP_DATA mmdata{0};
-	data.LoadLibraryA = LoadLibraryA;
-	data.GetProcAddress = GetProcAddress;
-
-
-	IMAGE_SECTION_HEADER* section_header = IMAGE_FIRST_SECTION(old_nt_header);
-	for(uint32_t i = 0; i != old_file_header->NumberOfSections; i++, section_header++){
-		if(!section_header->SizeOfRawData) continue;
-		int ws = WriteProcessMemory(process, target_base + section_header->VirtualAddress, src_data + section_header->PointerToRawData, section_header->SizeOfRawData)
-		if(!ws) {
-			errmsg("Allocation in target failed!");
-			delete[] src_data;
-			VirtualFreeEx(process, target_base, MEM_RELEASE);
-			return;
-		}
-	}
-
-	memcpy(src_data, &mmdata, sizeof(mmdata));
-	WriteProcessMemory(process, target_base, src_data, 0x1000, nullptr);
-
-
-	delete[] src_data;
-
-	void* shellode = VirtualAllocEx(process, nullptr, 0x1000, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	if(!shellcode) {
-		VirtualFreeEx(process, target_base, 0,  MEM_RELEASE);
-		return;	
-	}
-
-	WriteProcessMemory(process, shellcode, injutils::shellcode, 0x1000, nullptr);
-
-	//*_mmdata = mmdata;
-	*_tbase = target_base; 
-	return shellcode;
-	//create remote thread;
-
-}
-
-void dllinject::ManualMapCleanup(HANDLE process, void* shellcode, void* tbase){
-	HINSTANCE hchk = NULL;
-	while(!hchk){
-		MANUALMAP_DATA mmdata = {0};
-		ReadProcessMemory(process, tbase, &mmdata, sizeof(mmdata), nullptr);
-		hchk = mmdata.hMod;
-	}
-	Sleep(10);
-	VirtualFreeEx(process, shellcode, 0, MEM_RELEASE);
-}
-
-void __stdcall injutils::shellcode(MANUALMAP_DATA* data){ // add p_ prefix to pointer variables
-	if(!data) return;
-	BYTE* base = (BYTE*)data;
-	IMAGE_OPTIONAL_HEADER* opt = &((IMAGE_NT_HEADERS*)(base + (IMAGE_DOS_HEADER*)data->e_lfanew))->OptionalHeader;
-
-	auto _LoadLibraryA = data->fpLoadLibraryA;
-	auto _GetProcAddress = data->fpGetProcAddress;
-	auto _DllMain = data->fpDLLEntryPoint;
-	
-	// (https://www.cnblogs.com/walfud/articles/2608019.html)
-
-	//relocations
-
-	BYTE* delta = base - opt->ImageBase;
-	if(delta){
-		if(opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size){
-			IMAGE_BASE_RELOCATION* reloc_data = (PIMAGE_BASE_RELOCATION)(base + opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
-			while(reloc_data->VirtualAddress){
-				unsigned type_offset_entries = (sizeof(reloc_data->SizeOfBlock) - sizeof(IMAGE_BASE_RELOCATION))/sizeof(WORD);
-				WORD* curr_type_offset = (WORD*)(reloc_data + 1);
-				for(int i = 0; i < type_offset_entries; i++, curr_type_offset++){
-					// if(((BASE_RELOCATION_ENTRY*)curr_type_offset)->Type == IMAGE_REL_BASED_DIR64)
-					if ((*curr_type_offset >> 12) == IMAGE_REL_BASED_DIR64){
-						// uintptr_t* patch = (uintptr_t*)(base + reloc_data->VirtualAddress + ((BASE_RELOCATION_ENTRY*)curr_type_offset)->Offset)
-						uintptr_t* patch = (uintptr_t*)(base + reloc_data->VirtualAddress + *curr_type_offset & 0xFFF)
-						*patch += (uintptr_t)delta; 
-					}
-				}
-				reloc_data = (IMAGE_BASE_RELOCATION*)((BYTE*)reloc_data + reloc_data->SizeOfBlock);
-			}
-		}
-		if(opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size){
-			IMAGE_IMPORT_DESCRIPTOR* import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)(base + opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress); 
-			while(import_descriptor->Name){
-				char* module_name = (char*)(base + import_descriptor->Name);
-				HINSTANCE module_handle = _LoadLibraryA(module_name);
-				uintptr_t* thunk_ref = (uintptr_t*)(base + import_descriptor->OriginalFirstThunk);
-				uintptr_t* func_ref = (uintptr_t*)(base + import_descriptor->FirstThunk);
-
-				if(!thunk_ref) thunk_ref = func_ref;
-				for(;*thunk_ref;thunk_ref++,func_ref++) {
-					if(IMAGE_SNAP_BY_ORDINAL(thunk_ref)) *func_ref = _GetProcAddress(module_handle, *thunk_ref & 0xFFFF) // low 2 byte is ordinal
-					else {
-						IMAGE_IMPORT_BY_NAME* iibnp = (PIMAGE_IMPORT_BY_NAME)(base + *thunk_ref); 
-						*func_ref = _GetProcAddress(module_handle, iibnp->Name);
-					}
-				}
-				import_descriptor++;
-			}
-		}
-		if(opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].Size){
-			IMAGE_TLS_DIRECTORY* tls = (PIMAGE_TLS_DIRECTORY)(base + opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress);
-			PIMAGE_TLS_CALLBACK current_callback = (PIMAGE_TLS_CALLBACK)tls->AddressOfCallbacks;
-			for(;current_callback && *current_callback; current_callback++) (*current_callback)(base, DLL_PROCESS_ATTATCH, nullptr);
-		}
-
-		_DllMain(base, DLL_PROCESS_ATTATCH, nullptr);
-		data->hMod = (HISTANCE)base;
-	}
-}
+//void* dllinject::ManualMap(HANDLE process, LPCWSTR dllpath, OUT void** _tbase /*,OUT void** _mmdata*/){
+//	BYTE* src_data = nullptr;
+//	IMAGE_NT_HEADERS* old_nt_header = nullptr;
+//	IMAGE_OPTIONAL_HEADER* old_opt_header = nullptr;
+//	IMAGE_FILE_HEADER* old_file_header = nullptr;
+//	BYTE* target_base = nullptr;
+//	//DWORD chk = 0;
+//
+//	if(!GetFileAttributes(dllpath)) {
+//		errmsg("File doesnt exist");
+//		return;
+//	}
+//
+//	std::ifstream DLLFile(dllpath, std::ios::binary | std::ios::ate);
+//	if(DLLFile.fail()) {
+//		errmsg("File couldnt be opende for wrtie!");
+//		return;
+//	}
+//
+//	auto size = DLLFile.tellg();
+//
+//	if(size < 0x1000) {
+//		errmsg("File doesnt follow PE format and is invalid");
+//		DLLFile.close();
+//		return;
+//	}
+//
+//	src_data = new BYTE[(uintptr_t)(size)];
+//	if(stc_date = nullptr) {
+//		errmsg("Allocation failed, not enough memory in current process");
+//		return;	
+//	}
+//
+//	DLLFile.seekg(0, std::ios::beg);
+//	DLLFile.read((char*)src_data, size);
+//	DLLFile.close;
+//
+//	if( ((IMAGE_DOS_HEADER*)src_data)->e_mageic != IMAGE_DOS_SIGNATURE){ // IMAGE_DOS_SIGNATURE == 5A4D == MZ
+//		errmsg("Not a PE file!");
+//		return;
+//	}
+//	old_nt_header = (IMAGE_NT_HEADERS*)(src_data + ((IMAGE_DOS_HEADER*)src_data)->e_lfanew);
+//	old_opt_header = &old_nt_header->OptionalHeader;
+//	old_file_header = &old_nt_header->FileHeader;
+//
+//	if(old_nt_header->Signature != IMAGE_NT_SIGNATURE) {
+//		errmsg("Not x64!");
+//		return;
+//	}
+//	if(old_file_header->Machine != IMAGE_FILE_MACHINE_AMD64){
+//		errmsg("Not a PE file!");
+//		return;
+//	}
+//
+//	target_base = (BYTE*)VirtualAllocEx(process, (void*)old_opt_header->ImageBase, old_opt_header->SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+//	if(target_base == nullptr) target_base = (BYTE*)VirtualAllocEx(process, nullptr, old_opt_header->SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+//	if(!target_base) {
+//		errmsg("Allocation in target failed!");
+//		delete[] src_data;
+//		return;
+//	}
+//
+//	MANUALMAP_DATA mmdata{0};
+//	data.LoadLibraryA = LoadLibraryA;
+//	data.GetProcAddress = GetProcAddress;
+//
+//
+//	IMAGE_SECTION_HEADER* section_header = IMAGE_FIRST_SECTION(old_nt_header);
+//	for(uint32_t i = 0; i != old_file_header->NumberOfSections; i++, section_header++){
+//		if(!section_header->SizeOfRawData) continue;
+//		int ws = WriteProcessMemory(process, target_base + section_header->VirtualAddress, src_data + section_header->PointerToRawData, section_header->SizeOfRawData)
+//		if(!ws) {
+//			errmsg("Allocation in target failed!");
+//			delete[] src_data;
+//			VirtualFreeEx(process, target_base, MEM_RELEASE);
+//			return;
+//		}
+//	}
+//
+//	memcpy(src_data, &mmdata, sizeof(mmdata));
+//	WriteProcessMemory(process, target_base, src_data, 0x1000, nullptr);
+//
+//
+//	delete[] src_data;
+//
+//	void* shellode = VirtualAllocEx(process, nullptr, 0x1000, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+//	if(!shellcode) {
+//		VirtualFreeEx(process, target_base, 0,  MEM_RELEASE);
+//		return;	
+//	}
+//
+//	WriteProcessMemory(process, shellcode, injutils::shellcode, 0x1000, nullptr);
+//
+//	//*_mmdata = mmdata;
+//	*_tbase = target_base; 
+//	return shellcode;
+//	//create remote thread;
+//
+//}
+//
+//void dllinject::ManualMapCleanup(HANDLE process, void* shellcode, void* tbase){
+//	HINSTANCE hchk = NULL;
+//	while(!hchk){
+//		MANUALMAP_DATA mmdata = {0};
+//		ReadProcessMemory(process, tbase, &mmdata, sizeof(mmdata), nullptr);
+//		hchk = mmdata.hMod;
+//	}
+//	Sleep(10);
+//	VirtualFreeEx(process, shellcode, 0, MEM_RELEASE);
+//}
+//
+//void __stdcall injutils::shellcode(MANUALMAP_DATA* data){ // add p_ prefix to pointer variables
+//	if(!data) return;
+//	BYTE* base = (BYTE*)data;
+//	IMAGE_OPTIONAL_HEADER* opt = &((IMAGE_NT_HEADERS*)(base + (IMAGE_DOS_HEADER*)data->e_lfanew))->OptionalHeader;
+//
+//	auto _LoadLibraryA = data->fpLoadLibraryA;
+//	auto _GetProcAddress = data->fpGetProcAddress;
+//	auto _DllMain = data->fpDLLEntryPoint;
+//	
+//	// (https://www.cnblogs.com/walfud/articles/2608019.html)
+//
+//	//relocations
+//
+//	BYTE* delta = base - opt->ImageBase;
+//	if(delta){
+//		if(opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size){
+//			IMAGE_BASE_RELOCATION* reloc_data = (PIMAGE_BASE_RELOCATION)(base + opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
+//			while(reloc_data->VirtualAddress){
+//				unsigned type_offset_entries = (sizeof(reloc_data->SizeOfBlock) - sizeof(IMAGE_BASE_RELOCATION))/sizeof(WORD);
+//				WORD* curr_type_offset = (WORD*)(reloc_data + 1);
+//				for(int i = 0; i < type_offset_entries; i++, curr_type_offset++){
+//					// if(((BASE_RELOCATION_ENTRY*)curr_type_offset)->Type == IMAGE_REL_BASED_DIR64)
+//					if ((*curr_type_offset >> 12) == IMAGE_REL_BASED_DIR64){
+//						// uintptr_t* patch = (uintptr_t*)(base + reloc_data->VirtualAddress + ((BASE_RELOCATION_ENTRY*)curr_type_offset)->Offset)
+//						uintptr_t* patch = (uintptr_t*)(base + reloc_data->VirtualAddress + *curr_type_offset & 0xFFF)
+//						*patch += (uintptr_t)delta; 
+//					}
+//				}
+//				reloc_data = (IMAGE_BASE_RELOCATION*)((BYTE*)reloc_data + reloc_data->SizeOfBlock);
+//			}
+//		}
+//		if(opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size){
+//			IMAGE_IMPORT_DESCRIPTOR* import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)(base + opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress); 
+//			while(import_descriptor->Name){
+//				char* module_name = (char*)(base + import_descriptor->Name);
+//				HINSTANCE module_handle = _LoadLibraryA(module_name);
+//				uintptr_t* thunk_ref = (uintptr_t*)(base + import_descriptor->OriginalFirstThunk);
+//				uintptr_t* func_ref = (uintptr_t*)(base + import_descriptor->FirstThunk);
+//
+//				if(!thunk_ref) thunk_ref = func_ref;
+//				for(;*thunk_ref;thunk_ref++,func_ref++) {
+//					if(IMAGE_SNAP_BY_ORDINAL(thunk_ref)) *func_ref = _GetProcAddress(module_handle, *thunk_ref & 0xFFFF) // low 2 byte is ordinal
+//					else {
+//						IMAGE_IMPORT_BY_NAME* iibnp = (PIMAGE_IMPORT_BY_NAME)(base + *thunk_ref); 
+//						*func_ref = _GetProcAddress(module_handle, iibnp->Name);
+//					}
+//				}
+//				import_descriptor++;
+//			}
+//		}
+//		if(opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].Size){
+//			IMAGE_TLS_DIRECTORY* tls = (PIMAGE_TLS_DIRECTORY)(base + opt->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress);
+//			PIMAGE_TLS_CALLBACK current_callback = (PIMAGE_TLS_CALLBACK)tls->AddressOfCallbacks;
+//			for(;current_callback && *current_callback; current_callback++) (*current_callback)(base, DLL_PROCESS_ATTATCH, nullptr);
+//		}
+//
+//		_DllMain(base, DLL_PROCESS_ATTATCH, nullptr);
+//		data->hMod = (HISTANCE)base;
+//	}
+//}
 
 /*
 #define IMAGE_DOS_SIGNATURE                 0x5A4D      // MZ

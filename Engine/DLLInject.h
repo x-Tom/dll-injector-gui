@@ -54,23 +54,24 @@ public:
 private:
 	
 	static void* ManualMap(HANDLE process, LPCWSTR dllpath, OUT void** _tbase);
+	static void* ManualMapCleanup(HANDLE process, void* shellcode, void* tbase);
 	static DWORD _injectfpath(LPWSTR, HANDLE, DWORD);
 	static DWORD _injectrpath(std::wstring, HANDLE, DWORD);
 	
 };
 
 namespace injutils {
-	struct MANUALMAP_DATA {
+	/*struct MANUALMAP_DATA {
 		HISTANCE (WINAPI*)(LPCSTR) 					fpLoadLibraryA;
 		UINT_PTR (WINAPI*)(HINSTANCE, LPCSTR) 		fpGetProcAddress;
 		BOOL	 (WINAPI*)(LPVOID, DWORD, LPVOID) 	fpDLLEntryPoint;
 		HMODULE 									hMod;
-	}
+	}*/
 
 	// typedef struct BASE_RELOCATION_ENTRY {
 	// 	USHORT Offset 	: 12;
 	// 	USHORT Type 	:  4;
 	// } BASE_RELOCATION_ENTRY, *PBASE_RELOCATION_ENTRY;
 
-	void  __stdcall shellcode(MANUALMAP_DATA*);
+	//void  __stdcall shellcode(MANUALMAP_DATA*);
 }

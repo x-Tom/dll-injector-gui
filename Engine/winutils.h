@@ -23,11 +23,11 @@ namespace winutils {
     );
 
     struct LDR_PARAMS {
-        IN PWCHAR               PathToFile OPTIONAL,
-        IN ULONG                Flags OPTIONAL,
-        IN PUNICODE_STRING      ModuleFileName,
-        OUT PHANDLE             ModuleHandle 
-    }
+        IN PWCHAR               PathToFile OPTIONAL;
+        IN ULONG                Flags OPTIONAL;
+        IN PUNICODE_STRING      ModuleFileName;
+        OUT PHANDLE             ModuleHandle;
+    };
 
 
 	NTSTATUS NTAPI LdrLoadDllWrapper(LDR_PARAMS*);
