@@ -19,8 +19,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     //int const width = MV_SCREENWIDTH/3.5, height = MV_SCREENHEIGHT/2.5; // 2560x1440
     int const width = MV_SCREENWIDTH / 2.6, height = MV_SCREENHEIGHT / 1.8; // 1920x1080
-    std::vector<std::wstring> inj1 = {L"LoadLibraryExW",L"LdrLoadDll", L"ManualMap"};
-    std::vector<std::wstring> inj2 = {L"CreateRemoteThreadEx",L"NtCreateThreadEx", L"Thread Hijacking", L"SetWindowsHookEx", L"QueueUserAPC", L"KernelCallback"};
+    std::vector<std::wstring> inj1 = {L"LoadLibraryExW",L"LdrLoadDll", L"ManualMap (WIP)"};
+    std::vector<std::wstring> inj2 = {L"CreateRemoteThreadEx",L"NtCreateThreadEx", L"Thread Hijacking (WIP)", L"SetWindowsHookEx (WIP)", L"QueueUserAPC (WIP)", L"KernelCallback (WIP)"};
 
     WMain MainWindow(hInstance, L"Dynamic-link Library Injector", CW_USEDEFAULT, CW_USEDEFAULT, width, height);
 

@@ -85,8 +85,8 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 	void* rparams = nullptr; //remote params
 	// allocate dllpath buffer into remote process and write bytes into it  
 	void* dllpath_raddr = VirtualAllocEx(process, 0, wcsbytes(dllpath), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-	LPWSTR dllname = (CONTAINING_RECORD(dllpath, OPENFILENAME, lpstrFile))->lpstrFileTitle;
-	void* dllname_raddr = VirtualAllocEx(process, 0, wcsbytes(dllname), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	/*LPWSTR dllname = (CONTAINING_RECORD(dllpath, OPENFILENAME, lpstrFile))->lpstrFileTitle;
+	void* dllname_raddr = VirtualAllocEx(process, 0, wcsbytes(dllname), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);*/
 
 	if (dllpath_raddr == nullptr) {
 			MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
@@ -102,13 +102,13 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 			MessageBox(NULL, L"VirtualAllocEx Failed to allocate in target process!", L"Injection Failed", NULL);
 			return 1;
 	}
-	ws = WriteProcessMemory(process, dllname_raddr, dllname, wcsbytes(dllname), NULL);  // may need to put this in switch
-	if (ws == FALSE) {
-		MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
-		return 1;
-	}
+	//ws = WriteProcessMemory(process, dllname_raddr, dllname, wcsbytes(dllname), NULL);  // may need to put this in switch
+	//if (ws == FALSE) {
+	//	MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
+	//	return 1;
+	//}
 
-	void* tbase;
+	//void* tbase;
 
 	switch (options & 0xffff) {
 	case LOADLIBRARYEXW:
@@ -125,6 +125,15 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		
 		break;
 	case LDRLOADDLL:
+
+		LPWSTR dllname = (CONTAINING_RECORD(dllpath, OPENFILENAME, lpstrFile))->lpstrFileTitle;
+		void* dllname_raddr = VirtualAllocEx(process, 0, wcsbytes(dllname), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+		ws = WriteProcessMemory(process, dllname_raddr, dllname, wcsbytes(dllname), NULL);  // may need to put this in switch
+		if (ws == FALSE) {
+			MessageBox(NULL, L"WriteProcessMemory Failed to write memory in target process!", L"Injection Failed", NULL);
+			return 1;
+		}
 
 		funcptr = (LPVOID)winutils::LdrLoadDllWrapper;
 		
