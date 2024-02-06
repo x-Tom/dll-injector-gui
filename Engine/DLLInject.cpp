@@ -210,6 +210,7 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		}
 		break;
 	case NTCREATETHREADEX:
+	//default:
 		winutils::pNtCreateThreadEx NtCreateThreadEx = (winutils::pNtCreateThreadEx)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtCreateThreadEx");
 		NtCreateThreadEx(&hthread, 0x1FFFFF, NULL, process, (LPTHREAD_START_ROUTINE) funcptr, rparams, FALSE, NULL, NULL, NULL, NULL);
 		if (hthread == nullptr) {
