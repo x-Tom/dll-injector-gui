@@ -5,7 +5,7 @@
 #include "WModuleListView.h"
 
 
-WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title) 
+WMain::WMain(HINSTANCE hInst, const std::wstring& title, int x, int y, int w, int h) : GWindow(hInst, L"EngineMainWindow", nullptr, x, y, w, h), title(title), app(nullptr)
 {
     WNDCLASSEX wc = { 0 };
 

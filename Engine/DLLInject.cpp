@@ -111,6 +111,8 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 	//void* tbase;
 
 	switch (options & 0xffff) {
+	default:
+		MessageBox(NULL, L"Executing LoadLibraryExW. Unfinished method selected.", L"Injection Method", NULL);
 	case LOADLIBRARYEXW:
 		
 		funcptr = (LPVOID)GetProcAddress(LoadLibrary(L"kernel32"), "LoadLibraryW");
@@ -202,6 +204,8 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 	}
 
 	switch (options & (0xFFFF << 16)) {
+	default:
+		MessageBox(NULL, L"Executing CreateRemoteThreadEx. Unfinished method selected.", L"Execution Method", NULL);
 	case CREATEREMOTETHREADEX:
 		hthread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)funcptr, rparams, 0, &dword);
 		if (hthread == nullptr) {

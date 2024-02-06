@@ -7,7 +7,7 @@ WComboBox::WComboBox(HINSTANCE hInst, HMENU id, int x, int y, int w, int h, std:
 
 bool WComboBox::Create(HWND parent)
 {
-	hwnd = CreateWindow(WC_COMBOBOX, L"", styles | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE, x, y, w, h, parent, NULL, hinst, NULL);
+	hwnd = CreateWindow(WC_COMBOBOX, L"", styles | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE, x, y, w, h, parent, id, hinst, NULL);
 	for (auto& str : list) {
 		SendMessage(hwnd, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)str.c_str());
 	}
