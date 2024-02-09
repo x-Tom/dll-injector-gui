@@ -40,7 +40,7 @@ DWORD dllinject::inject(){
 	if (proc == NULL) MessageBox(NULL, buf, L"Process not found, Injection Failed!", NULL);
 	DWORD opts = (inj_load_idx+1) | ((inj_exec_idx+1) << 16);
 
-	return dllinject::_injectfpath(opfn.lpstrFile, proc, opts);
+	return dllinject::_injectfpath(opfn, proc, opts);
 }
 
 DWORD dllinject::eject(){
@@ -77,10 +77,16 @@ DWORD dllinject::eject(){
 	return 0;
 }
 
-DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
+DWORD dllinject::_injectfpath(OPENFILENAME ofn, HANDLE process, DWORD options) {
 	DWORD dword;
 	LPVOID funcptr = nullptr;
 	HANDLE hthread = nullptr;
+
+	LPWSTR dllpath = ofn.lpstrFile;
+	LPWSTR dllname = ofn.lpstrFileTitle;
+
+	OutputDebugStringW(dllname);
+
 
 	void* rparams = nullptr; //remote params
 	// allocate dllpath buffer into remote process and write bytes into it  
@@ -128,7 +134,6 @@ DWORD dllinject::_injectfpath(LPWSTR dllpath, HANDLE process, DWORD options) {
 		break;
 	case LDRLOADDLL:
 
-		LPWSTR dllname = (CONTAINING_RECORD(dllpath, OPENFILENAME, lpstrFile))->lpstrFileTitle;
 		void* dllname_raddr = VirtualAllocEx(process, 0, wcsbytes(dllname), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 		ws = WriteProcessMemory(process, dllname_raddr, dllname, wcsbytes(dllname), NULL);  // may need to put this in switch

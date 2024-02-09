@@ -55,8 +55,8 @@ private:
 	
 	static void* ManualMap(HANDLE process, LPCWSTR dllpath, OUT void** _tbase);
 	static void* ManualMapCleanup(HANDLE process, void* shellcode, void* tbase);
-	static DWORD _injectfpath(LPWSTR, HANDLE, DWORD);
-	static DWORD _injectrpath(std::wstring, HANDLE, DWORD);
+	static DWORD _injectfpath(OPENFILENAME, HANDLE, DWORD);
+	//static DWORD _injectrpath(std::wstring, HANDLE, DWORD);
 	
 };
 
