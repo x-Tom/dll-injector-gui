@@ -22,6 +22,12 @@ namespace winutils {
         OUT PHANDLE             ModuleHandle 
     );
 
+    typedef NTSYSAPI (VOID *pRtlInitUnicodeString)(
+        OUT PUNICODE_STRING         DestinationString,
+        IN __drv_aliasesMem PCWSTR SourceString
+    );
+
+
     struct LDR_PARAMS {
         IN PWCHAR               PathToFile OPTIONAL;
         IN ULONG                Flags OPTIONAL;

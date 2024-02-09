@@ -163,11 +163,15 @@ DWORD dllinject::_injectfpath(OPENFILENAME ofn, HANDLE process, DWORD options) {
 
 		PHANDLE rhmodule = (PHANDLE)VirtualAllocEx(process, 0, sizeof(HANDLE), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
+		// UNICODE_STRING ustr;
+		// ustr.Length = wcsbytes(dllname) - sizeof(wchar_t);
+		// ustr.MaximumLength = wcsbytes(dllname);
+		// ustr.Buffer = (PWSTR)dllname_raddr;
+		
 		UNICODE_STRING ustr;
-		ustr.Length = wcsbytes(dllname) - sizeof(wchar_t);
-		ustr.MaximumLength = wcsbytes(dllname);
+		winutils::pRtlInitUnicodeString RtlInitUnicodeString = (winutils::pRtlInitUnicodeString)GetProcAddress(GetModuleHandle(L"ntdll.dll"), "pRtlInitUnicodeString");
+		RtlInitUnicodeString(&ustr, dllname);
 		ustr.Buffer = (PWSTR)dllname_raddr;
-
 
 		void* ustr_raddr = VirtualAllocEx(process, 0, sizeof(ustr), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 		if (ustr_raddr == nullptr) {
