@@ -187,7 +187,8 @@ DWORD dllinject::_injectfpath(OPENFILENAME ofn, HANDLE process, DWORD options) {
 		ldr.PathToFile = (PWSTR)dllpath_raddr;
 		ldr.Flags = 0;
 		ldr.ModuleFileName = (PUNICODE_STRING)ustr_raddr;
-		ldr.ModuleHandle = rhmodule;
+		// ldr.ModuleHandle = rhmodule;
+		ldr.ModuleHandle = NULL;
 		
 
 		void* ldr_raddr = VirtualAllocEx(process, 0, sizeof(ldr), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
